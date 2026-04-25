@@ -1110,6 +1110,23 @@ async function showActor(castId, name){
   const type=params.get('type');
   const tokenFromUrl=params.get('access_token');
 
+  // GoogleOAuthコールバック（最優先で処理してLocalStorageに保存）
+  if(tokenFromUrl&&type!=='recovery'){
+    accessToken=tokenFromUrl;
+    localStorage.setItem('kdrama_token',tokenFromUrl);
+    const r=await sbFetch('/auth/v1/user','GET',null,accessToken);
+    if(r.ok&&r.data?.id){
+      currentUser=r.data;
+      localStorage.setItem('kdrama_user',JSON.stringify({id:currentUser.id,email:currentUser.email}));
+      // location.replaceで現在のURLを書き換え（supabaseのURLを履歴から消す）
+      window.location.replace(window.location.pathname+'#loggedin');
+      return; // replaceで再読み込みされるのでここで終了
+    }else{
+      localStorage.removeItem('kdrama_token');
+      localStorage.removeItem('kdrama_user');
+    }
+  }
+
   // パスワードリセット
   if(tokenFromUrl&&type==='recovery'){
     accessToken=tokenFromUrl;
@@ -1119,16 +1136,15 @@ async function showActor(castId, name){
     return;
   }
 
-  // LocalStorageを最優先（戻るボタン対策）
+  // #loggedinまたはLocalStorageからトークン復元
+  const isLoggedInHash=hash==='#loggedin'||hash==='#app';
   try{
     const savedToken=localStorage.getItem('kdrama_token');
     if(savedToken){
       const r=await sbFetch('/auth/v1/user','GET',null,savedToken);
       if(r.ok&&r.data?.id){
         accessToken=savedToken;currentUser=r.data;
-        // hashをクリアして履歴を上書き
-        history.replaceState(null,'',window.location.pathname);
-        history.pushState(null,'',window.location.pathname+'#app');
+        history.replaceState(null,'',window.location.pathname+'#app');
         await startApp();
         return;
       }else{
@@ -1137,25 +1153,6 @@ async function showActor(castId, name){
       }
     }
   }catch(e){}
-
-  // GoogleOAuthコールバック
-  if(tokenFromUrl){
-    // まず即座にhashをクリア（履歴にaccess_tokenが残らないように）
-    history.replaceState(null,'',window.location.pathname+'#app');
-    accessToken=tokenFromUrl;
-    // LocalStorageに保存してから起動（戻ってきても復元できるように）
-    localStorage.setItem('kdrama_token', tokenFromUrl);
-    const r=await sbFetch('/auth/v1/user','GET',null,accessToken);
-    if(r.ok&&r.data?.id){
-      currentUser=r.data;
-      localStorage.setItem('kdrama_user', JSON.stringify({id:currentUser.id,email:currentUser.email}));
-      await startApp();
-      return;
-    }else{
-      localStorage.removeItem('kdrama_token');
-      localStorage.removeItem('kdrama_user');
-    }
-  }
 
   // ログイン画面
   history.replaceState(null,'',window.location.pathname);

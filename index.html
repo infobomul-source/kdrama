@@ -577,9 +577,7 @@ async function startApp(){
 window.addEventListener('popstate',async function(e){
   const token=localStorage.getItem('kdrama_token');
   if(token){
-    // 常に#appに戻す
     history.pushState(null,'',window.location.pathname+'#app');
-    // メモリ上にトークンがなければ復元
     if(!accessToken){
       try{
         const r=await sbFetch('/auth/v1/user','GET',null,token);
@@ -588,13 +586,21 @@ window.addEventListener('popstate',async function(e){
           document.getElementById('authWrap').style.display='none';
           document.getElementById('appWrap').style.display='block';
           document.getElementById('navEmail').textContent=currentUser.email;
+          await loadUserDramas();
         }else{
           localStorage.removeItem('kdrama_token');
+          localStorage.removeItem('kdrama_user');
+          history.replaceState(null,'',window.location.pathname);
           document.getElementById('authWrap').style.display='flex';
           document.getElementById('appWrap').style.display='none';
         }
       }catch(e){}
     }
+  }else if(!accessToken){
+    // トークンなし・未ログイン → ログイン画面
+    history.replaceState(null,'',window.location.pathname);
+    document.getElementById('authWrap').style.display='flex';
+    document.getElementById('appWrap').style.display='none';
   }
 });
 
@@ -750,7 +756,7 @@ async function loadBrowse(append=false){
   }
   const q=document.getElementById('browseSearch').value.trim();
   const sort=document.getElementById('browseSort').value;
-  let url='/rest/v1/dramas?select=id,title,original,year,poster_path,genre&type=in.(ドラマ,映画)';
+  let url='/rest/v1/dramas?select=id,title,original,year,poster_path,genre&type=in.(ドラマ,映画)&genre=not.ilike.*アニメ*';
   // フィルター
   if(browseFilter.year==='pre2020') url+='&year=lt.2020&year=gt.0';
   else if(browseFilter.year!=='all') url+=`&year=eq.${browseFilter.year}`;
@@ -1120,7 +1126,9 @@ async function showActor(castId, name){
       const r=await sbFetch('/auth/v1/user','GET',null,savedToken);
       if(r.ok&&r.data?.id){
         accessToken=savedToken;currentUser=r.data;
-        history.replaceState(null,'',window.location.pathname+'#app');
+        // hashをクリアして履歴を上書き
+        history.replaceState(null,'',window.location.pathname);
+        history.pushState(null,'',window.location.pathname+'#app');
         await startApp();
         return;
       }else{

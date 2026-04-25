@@ -925,9 +925,10 @@ async function openDet(id){
   document.getElementById('dm-poster').innerHTML='';
 
   // ドラマ詳細 + キャストを並列取得
+  const tk = accessToken || SUPA_KEY;
   const [rDrama, rCast] = await Promise.all([
-    sbFetch(`/rest/v1/dramas?id=eq.${id}&select=*`),
-    sbFetch(`/rest/v1/drama_cast?drama_id=eq.${id}&select=name,name_original,role&limit=20`),
+    sbFetch(`/rest/v1/dramas?id=eq.${id}&select=*`, 'GET', null, tk),
+    sbFetch(`/rest/v1/drama_cast?drama_id=eq.${id}&select=name,name_original,role&order=id.asc&limit=20`, 'GET', null, tk),
   ]);
 
   if(!rDrama.ok || !rDrama.data?.length){ document.getElementById('dm-title').textContent='取得失敗'; return; }
@@ -954,9 +955,10 @@ async function openDet(id){
 
   // メタ情報
   const metaItems=[
-    ['放送局/製作',d.station||d.company||''],
-    ['放送年',d.year||''],
+    ['放送局',d.station||''],
+    ['放送年度',d.year?d.year+'年':''],
     ['話数',d.eps?d.eps+'話':''],
+    ['制作会社',d.company||''],
   ].filter(([,v])=>v);
   document.getElementById('dm-meta').innerHTML = metaItems.map(([l,v])=>
     `<div class="mmi"><div class="mmi-l">${esc(l)}</div><div class="mmi-v">${esc(v)}</div></div>`
@@ -972,9 +974,17 @@ async function openDet(id){
     }).join('');
   }
 
-  // ★修正③：配信サービスリンク（drama_streamsテーブルから取得）
-  const rStreams = await sbFetch(`/rest/v1/drama_streams?drama_id=eq.${id}&select=service,url`);
-  const streamRows = (rStreams.ok && Array.isArray(rStreams.data)) ? rStreams.data : [];
+  // ★修正③：配信サービスリンク
+  // drama_streamsテーブルを優先し、空ならstationカラムにフォールバック
+  const rStreams = await sbFetch(`/rest/v1/drama_streams?drama_id=eq.${id}&select=service,url`, 'GET', null, tk);
+  let streamRows = (rStreams.ok && Array.isArray(rStreams.data) && rStreams.data.length) ? rStreams.data : [];
+  if(!streamRows.length && d.station){
+    // stationカラムから配信サービスを抽出（放送局は除外）
+    const stationList = d.station.split(',').map(s=>s.trim()).filter(Boolean);
+    streamRows = stationList
+      .filter(s => Object.keys(STREAM_CFG).some(k => s.includes(k)))
+      .map(s => ({service: s, url: null}));
+  }
   renderStreamLinks(streamRows, d.title||'');
 
   // ユーザーアクション

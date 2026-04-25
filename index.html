@@ -670,7 +670,7 @@ async function loadTop(){
   // ドラマ・映画のみ取得（type=in.(ドラマ,映画)）
   const [rTotal, rDramas] = await Promise.all([
     sbFetch('/rest/v1/dramas?select=count&type=in.(ドラマ,映画)'),
-    sbFetch('/rest/v1/dramas?select=id,title,original,type,genre,year,poster,score&type=in.(ドラマ,映画)&order=score.desc.nullslast&limit=20'),
+    sbFetch('/rest/v1/dramas?select=id,title,original,type,genre,year,poster_path&type=in.(ドラマ,映画)&order=year.desc.nullslast,id.desc&limit=20'),
   ]);
 
   const total = rTotal.ok ? (rTotal.data[0]?.count||0) : 0;
@@ -685,7 +685,7 @@ async function loadTop(){
   // 人気ランキング（上位10）
   const top10 = rDramas.data.slice(0,10);
   // 新着（year降順 上位10）
-  const rNew = await sbFetch('/rest/v1/dramas?select=id,title,original,type,year,poster,score&type=in.(ドラマ,映画)&order=year.desc.nullslast,id.desc&limit=10');
+  const rNew = await sbFetch('/rest/v1/dramas?select=id,title,original,type,year,poster_path&type=in.(ドラマ,映画)&order=year.desc.nullslast,id.desc&limit=10');
   const newDramas = rNew.ok ? rNew.data : [];
 
   let html = '';
@@ -697,13 +697,12 @@ async function loadTop(){
     const ud = userDramas[d.id];
     const sc = ud?.status ? SC[ud.status] : null;
     html += `<div class="rank-card" onclick="openDet(${d.id})">
-      ${posterEl(d.poster,'rank-poster')}
+      ${posterEl(d.poster_path,'rank-poster')}
       <div class="rank-badge">${i+1}位</div>
       ${ud?.status?`<div class="dcard-status" style="background:${sc?.bg};color:${sc?.hex}">${ud.status}</div>`:''}
       <div class="rank-info">
         <div class="rank-title">${esc(d.title)}</div>
         <div class="rank-meta">${d.year||''} · <span class="tag-type">${d.type||''}</span></div>
-        ${d.score?`<div class="rank-score">♥ ${d.score.toFixed(1)}</div>`:''}
       </div>
     </div>`;
   });
@@ -717,7 +716,7 @@ async function loadTop(){
       const ud = userDramas[d.id];
       const sc = ud?.status ? SC[ud.status] : null;
       html += `<div class="rank-card" onclick="openDet(${d.id})">
-        ${posterEl(d.poster,'rank-poster')}
+        ${posterEl(d.poster_path,'rank-poster')}
         ${ud?.status?`<div class="dcard-status" style="background:${sc?.bg};color:${sc?.hex}">${ud.status}</div>`:''}
         <div class="rank-info">
           <div class="rank-title">${esc(d.title)}</div>
@@ -764,7 +763,7 @@ async function loadBrowse(append=false){
   const sort = document.getElementById('browseSort')?.value||'popularity';
 
   // クエリ組み立て
-  let params = `select=id,title,original,type,genre,year,poster,score,station&limit=${BROWSE_LIMIT}&offset=${browseOffset}`;
+  let params = `select=id,title,original,type,genre,year,poster_path,station&limit=${BROWSE_LIMIT}&offset=${browseOffset}`;
 
   // ★修正①：ドラマ・映画のみ（無効なtypeは除外）
   if(browseFilter.type && browseFilter.type!=='all'){
@@ -783,8 +782,8 @@ async function loadBrowse(append=false){
   if(q) params += `&or=(title.ilike.*${encodeURIComponent(q)}*,original.ilike.*${encodeURIComponent(q)}*)`;
 
   // ソート
-  const orderMap={popularity:'score.desc.nullslast',year_desc:'year.desc.nullslast,id.desc',year_asc:'year.asc.nullslast',title:'title.asc'};
-  params += `&order=${orderMap[sort]||'score.desc.nullslast'}`;
+  const orderMap={popularity:'year.desc.nullslast,id.desc',year_desc:'year.desc.nullslast,id.desc',year_asc:'year.asc.nullslast',title:'title.asc'};
+  params += `&order=${orderMap[sort]||'year.desc.nullslast,id.desc'}`;
 
   // 配信フィルター（stationカラムにilike検索）
   if(browseFilter.stream && browseFilter.stream!=='all'){
@@ -813,12 +812,11 @@ async function loadBrowse(append=false){
     card.className='dcard';
     card.onclick=()=>openDet(d.id);
     card.innerHTML=`
-      ${posterEl(d.poster,'dcard-poster')}
+      ${posterEl(d.poster_path,'dcard-poster')}
       ${ud?.status?`<div class="dcard-status" style="background:${sc?.bg};color:${sc?.hex}">${ud.status}</div>`:''}
       <div class="dcard-body">
         <div class="dcard-title">${esc(d.title)}</div>
         <div class="dcard-meta">${d.year||''} · ${d.type||''}</div>
-        ${d.score?`<div class="dcard-score">♥ ${d.score.toFixed(1)}</div>`:''}
       </div>`;
     grid.appendChild(card);
   });
@@ -853,7 +851,7 @@ async function renderMyList(){
 
   // drama_idのリストを取得
   const ids = Object.keys(userDramas).join(',');
-  const r = await sbFetch(`/rest/v1/dramas?id=in.(${ids})&select=id,title,original,type,year,poster,eps,score,station`);
+  const r = await sbFetch(`/rest/v1/dramas?id=in.(${ids})&select=id,title,original,type,year,poster_path,eps,station`);
 
   if(!r.ok || !Array.isArray(r.data)){ grid.innerHTML='<div class="no-res">読み込みエラー</div>'; return; }
 
@@ -871,7 +869,7 @@ async function renderMyList(){
     const ud=d._ud;
     const sc=SC[ud?.status]||{};
     return `<div class="mcard" onclick="openDet(${d.id})">
-      ${posterEl(d.poster,'mcard-poster')}
+      ${posterEl(d.poster_path,'mcard-poster')}
       <div class="mcard-body">
         <div class="mcard-top">
           <div class="mcard-title">${esc(d.title)}</div>
@@ -936,7 +934,7 @@ async function openDet(id){
   const d = rDrama.data[0];
 
   // ポスター
-  document.getElementById('dm-poster').innerHTML = posterEl(d.poster,'mhd-poster');
+  document.getElementById('dm-poster').innerHTML = posterEl(d.poster_path,'mhd-poster');
 
   // タイトル
   document.getElementById('dm-title').textContent = d.title||'';
@@ -959,7 +957,6 @@ async function openDet(id){
     ['放送局/製作',d.station||d.company||''],
     ['放送年',d.year||''],
     ['話数',d.eps?d.eps+'話':''],
-    ['スコア',d.score?'♥ '+d.score.toFixed(1):''],
   ].filter(([,v])=>v);
   document.getElementById('dm-meta').innerHTML = metaItems.map(([l,v])=>
     `<div class="mmi"><div class="mmi-l">${esc(l)}</div><div class="mmi-v">${esc(v)}</div></div>`
@@ -1116,7 +1113,7 @@ async function showActor(name){
   }
 
   const ids = [...new Set(r.data.map(c=>c.drama_id))];
-  const rD = await sbFetch(`/rest/v1/dramas?id=in.(${ids.join(',')})&select=id,title,original,type,year,poster,score`);
+  const rD = await sbFetch(`/rest/v1/dramas?id=in.(${ids.join(',')})&select=id,title,original,type,year,poster_path`);
   const dramas = rD.ok ? rD.data : [];
 
   // 表示名
@@ -1135,11 +1132,10 @@ async function showActor(name){
     <div class="actor-works">
       ${dramas.map(d=>`
         <div class="dcard" onclick="openDet(${d.id})" style="cursor:pointer">
-          ${posterEl(d.poster,'dcard-poster')}
+          ${posterEl(d.poster_path,'dcard-poster')}
           <div class="dcard-body">
             <div class="dcard-title">${esc(d.title)}</div>
             <div class="dcard-meta">${d.year||''} · ${d.type||''}</div>
-            ${d.score?`<div class="dcard-score">♥ ${d.score.toFixed(1)}</div>`:''}
           </div>
         </div>`).join('')}
     </div>`;

@@ -40,16 +40,6 @@ body{background:var(--bg);color:var(--text);font-family:Meiryo,'メイリオ','M
 .auth-box{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:36px 32px;width:100%;max-width:380px;box-shadow:var(--shadow2);}
 .auth-logo{font-family:Meiryo,'メイリオ',sans-serif;font-size:1.5rem;font-weight:700;color:var(--btn);text-align:center;margin-bottom:4px;}
 .auth-sub{font-size:0.78rem;color:var(--muted);text-align:center;margin-bottom:28px;}
-.auth-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:22px;}
-.auth-tab{flex:1;background:transparent;border:none;border-bottom:2px solid transparent;font-family:Meiryo,'メイリオ',sans-serif;font-size:0.82rem;color:var(--muted);padding:8px;cursor:pointer;transition:all .15s;margin-bottom:-1px;}
-.auth-tab.active{color:var(--btn);border-bottom-color:var(--btn);font-weight:700;}
-.auth-fg{display:flex;flex-direction:column;gap:4px;margin-bottom:14px;}
-.auth-fg label{font-size:0.68rem;color:var(--muted);font-weight:700;}
-.auth-fg input{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:Meiryo,'メイリオ',sans-serif;font-size:0.85rem;color:var(--text);outline:none;transition:border-color .14s;}
-.auth-fg input:focus{border-color:var(--rose2);}
-.auth-btn{width:100%;background:var(--btn);color:white;border:none;border-radius:8px;padding:10px;font-family:Meiryo,'メイリオ',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;transition:background .13s;margin-top:6px;}
-.auth-btn:hover{background:var(--btn-h);}
-.auth-btn:disabled{opacity:.6;cursor:wait;}
 .auth-err{font-size:0.74rem;color:#c04040;background:#fef2f2;border:1px solid rgba(192,64,64,.2);border-radius:6px;padding:8px 10px;margin-top:10px;display:none;}
 .auth-err.show{display:block;}
 
@@ -157,10 +147,11 @@ body{background:var(--bg);color:var(--text);font-family:Meiryo,'メイリオ','M
 .mmi-v{font-size:0.78rem;color:var(--text);}
 .cast-chips{display:flex;flex-wrap:wrap;gap:5px;}
 .cast-chip{background:var(--bg2);border:1px solid var(--border);border-radius:100px;padding:3px 10px;font-size:0.73rem;cursor:pointer;transition:all .13s;}
-.cast-chip:hover{border-color:var(--rose2);color:var(--btn);}
+.cast-chip:hover{background:var(--bg3);border-color:var(--rose2);color:var(--btn);}
 .stream-chips{display:flex;flex-wrap:wrap;gap:6px;}
-.stream-chip{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:0.75rem;color:var(--text2);text-decoration:none;transition:all .13s;}
+.stream-chip{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:0.75rem;color:var(--text2);text-decoration:none;transition:all .13s;display:flex;align-items:center;gap:5px;}
 .stream-chip:hover{border-color:var(--btn);color:var(--btn);}
+.stream-chip-icon{font-size:0.85rem;}
 .mfoot{padding:14px 20px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;align-items:center;flex-wrap:wrap;}
 .btn-sm{background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-family:Meiryo,'メイリオ',sans-serif;font-size:0.77rem;color:var(--text2);cursor:pointer;transition:all .13s;display:flex;align-items:center;gap:5px;}
 .btn-sm:hover{border-color:var(--rose2);color:var(--btn);}
@@ -220,14 +211,21 @@ body{background:var(--bg);color:var(--text);font-family:Meiryo,'メイリオ','M
 .tag-genre{background:transparent;border:none;border-radius:0;padding:2px 0;font-size:0.75rem;color:var(--btn);font-weight:700;cursor:pointer;display:inline-block;}
 .tag-genre::before{content:'#';}
 .tag-genre:hover{text-decoration:underline;color:var(--btn-h);}
+.tag-type{background:#EAD9D5;border:1px solid #CEB6AF;border-radius:6px;padding:2px 10px;font-size:0.72rem;font-weight:700;color:#6E4A44;display:inline-block;}
 .ibtn{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 7px;cursor:pointer;color:var(--muted);transition:all .13s;display:flex;align-items:center;}
 .ibtn:hover{border-color:var(--rose2);color:var(--btn);}
 .ibtn.del:hover{border-color:#D07070;color:#D07070;}
 
-@media(max-width:600px){
-  .rank-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
-  .drama-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));}
-}
+/* 俳優ページ */
+.actor-wrap{max-width:900px;margin:0 auto;padding:20px 16px 40px;}
+.actor-hero{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:20px;display:flex;gap:16px;align-items:center;margin-bottom:20px;box-shadow:var(--shadow);}
+.actor-av{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--rose1),var(--btn));display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:white;font-weight:700;flex-shrink:0;}
+.actor-name{font-size:1.15rem;font-weight:700;margin-bottom:2px;}
+.actor-sub{font-size:0.75rem;color:var(--muted);}
+.actor-works{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
+.bk-btn{display:inline-flex;align-items:center;gap:5px;margin-bottom:14px;background:var(--white);border:1px solid var(--border);border-radius:100px;padding:6px 13px;font-family:Meiryo,'メイリオ',sans-serif;font-size:0.77rem;color:var(--muted);cursor:pointer;transition:all .14px;}
+.bk-btn:hover{color:var(--btn);border-color:var(--rose2);}
+
 /* Googleログインボタン */
 .google-btn{
   width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
@@ -239,20 +237,10 @@ body{background:var(--bg);color:var(--text);font-family:Meiryo,'メイリオ','M
 .google-btn:hover{background:var(--bg2);box-shadow:var(--shadow2);transform:translateY(-1px);}
 .google-btn:disabled{opacity:.6;cursor:wait;}
 
-/* 種別タグ */
-.tag-type{background:#EAD9D5;border:1px solid #CEB6AF;border-radius:6px;padding:2px 10px;font-size:0.72rem;font-weight:700;color:#6E4A44;display:inline-block;}
-/* 俳優ページ */
-.actor-wrap{max-width:900px;margin:0 auto;padding:20px 16px 40px;}
-.actor-hero{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:20px;display:flex;gap:16px;align-items:center;margin-bottom:20px;box-shadow:var(--shadow);}
-.actor-av{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--rose1),var(--btn));display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:white;font-weight:700;flex-shrink:0;}
-.actor-name{font-size:1.15rem;font-weight:700;margin-bottom:2px;}
-.actor-sub{font-size:0.75rem;color:var(--muted);}
-.actor-works{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
-.bk-btn{display:inline-flex;align-items:center;gap:5px;margin-bottom:14px;background:var(--white);border:1px solid var(--border);border-radius:100px;padding:6px 13px;font-family:Meiryo,'メイリオ',sans-serif;font-size:0.77rem;color:var(--muted);cursor:pointer;transition:all .14s;}
-.bk-btn:hover{color:var(--btn);border-color:var(--rose2);}
-/* cast-chip クリック可能スタイル強調 */
-.cast-chip{cursor:pointer;transition:all .13s;}
-.cast-chip:hover{background:var(--bg3);border-color:var(--rose2);color:var(--btn);}
+@media(max-width:600px){
+  .rank-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
+  .drama-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));}
+}
 </style>
 </head>
 <body>
@@ -273,24 +261,6 @@ body{background:var(--bg);color:var(--text);font-family:Meiryo,'メイリオ','M
   </div>
 </div>
 
-<!-- PASSWORD RESET -->
-<div id="resetWrap" class="auth-wrap" style="display:none">
-  <div class="auth-box">
-    <div class="auth-logo">🎬 韓ドラ帳</div>
-    <div class="auth-sub">新しいパスワードを設定してください</div>
-    <div class="auth-fg">
-      <label>新しいパスワード（6文字以上）</label>
-      <input type="password" id="reset-pw" placeholder="新しいパスワード" onkeydown="if(event.key==='Enter')doReset()">
-    </div>
-    <div class="auth-fg">
-      <label>確認のためもう一度入力</label>
-      <input type="password" id="reset-pw2" placeholder="パスワード（確認）" onkeydown="if(event.key==='Enter')doReset()">
-    </div>
-    <button class="auth-btn" id="resetBtn" onclick="doReset()">パスワードを変更する</button>
-    <div class="auth-err" id="resetErr"></div>
-  </div>
-</div>
-
 <!-- APP -->
 <div id="appWrap" style="display:none">
   <nav class="nav">
@@ -299,7 +269,7 @@ body{background:var(--bg);color:var(--text);font-family:Meiryo,'メイリオ','M
     <button class="nav-tab" id="nav-browse" onclick="showPage('browse',this)">作品一覧</button>
     <button class="nav-tab" id="nav-mylist" onclick="showPage('mylist',this)">マイリスト</button>
     <button class="nav-tab" id="nav-import" onclick="showPage('import',this)">Netflixインポート</button>
-    <button class="nav-tab" id="nav-actor" onclick="" style="display:none" id="nav-actor">俳優</button>
+    <button class="nav-tab" id="nav-actor" style="display:none">俳優</button>
     <div class="nav-sp"></div>
     <div class="nav-user">
       <span class="nav-email" id="navEmail"></span>
@@ -314,7 +284,7 @@ body{background:var(--bg);color:var(--text);font-family:Meiryo,'メイリオ','M
       <p>韓国ドラマの視聴を記録・管理しよう</p>
       <div class="hero-stats">
         <div class="hero-stat">登録作品数 <span id="heroTotal">-</span>件</div>
-        <div class="hero-stat">ユーザー視聴済み <span id="heroWatched">-</span>件</div>
+        <div class="hero-stat">あなたの視聴済み <span id="heroWatched">-</span>件</div>
       </div>
     </div>
     <div id="topContent">
@@ -337,6 +307,12 @@ body{background:var(--bg);color:var(--text);font-family:Meiryo,'メイリオ','M
           <option value="year_asc">古い順</option>
           <option value="title">タイトル順</option>
         </select>
+      </div>
+      <div class="frow">
+        <span class="flbl">種別</span>
+        <button class="chip active" data-type="all" onclick="setBrowseFilter('type','all',this)">すべて</button>
+        <button class="chip" data-type="ドラマ" onclick="setBrowseFilter('type','ドラマ',this)">ドラマ</button>
+        <button class="chip" data-type="映画" onclick="setBrowseFilter('type','映画',this)">映画</button>
       </div>
       <div class="frow">
         <span class="flbl">年度</span>
@@ -428,7 +404,7 @@ body{background:var(--bg);color:var(--text);font-family:Meiryo,'メイリオ','M
 </div>
 
 <!-- DETAIL MODAL -->
-<div class="ov" id="detOv">
+<div class="ov" id="detOv" onclick="ovClick(event)">
   <div class="modal">
     <div class="mhd">
       <div id="dm-poster"></div>
@@ -436,7 +412,6 @@ body{background:var(--bg);color:var(--text);font-family:Meiryo,'メイリオ','M
         <div class="mhd-title" id="dm-title"></div>
         <div class="mhd-orig" id="dm-orig"></div>
         <div class="mhd-tags" id="dm-tags"></div>
-        <!-- ログイン済みのみ：ステータス・評価 -->
         <div id="dm-useractions" style="display:none">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
             <select class="status-select" id="dm-status">
@@ -476,7 +451,7 @@ body{background:var(--bg);color:var(--text);font-family:Meiryo,'メイリオ','M
         <div class="cast-chips" id="dm-cast"></div>
       </div>
       <div class="m-section" id="dm-stream-wrap" style="display:none">
-        <div class="m-section-title">配信サービス</div>
+        <div class="m-section-title">▶ 配信サービスで見る</div>
         <div class="stream-chips" id="dm-streams"></div>
       </div>
     </div>
@@ -486,43 +461,57 @@ body{background:var(--bg);color:var(--text);font-family:Meiryo,'メイリオ','M
 <div class="save-ind" id="saveInd">保存しました</div>
 
 <script>
+// ═══════════════════════════════════════════════
+//  定数
+// ═══════════════════════════════════════════════
 const SUPA_URL='https://rojmsnblqtntaxcaxqgl.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJvam1zbmJscXRudGF4Y2F4cWdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NDA4NDUsImV4cCI6MjA4ODUxNjg0NX0.whj9TBFYoP6oCKOLgShkEd80-tvvPlnlgiqr0_MIGG0';
 const TMDB_IMG='https://image.tmdb.org/t/p/w300';
 
-// ── STREAM SERVICE LINKS (アフィリエイト) ──
-const STREAM_LINKS={
-  'Netflix':'https://www.netflix.com/search?q=',
-  'U-NEXT':'https://video.unext.jp/search?query=',
-  'Amazon Prime Video':'https://www.amazon.co.jp/s?k=',
-  'Hulu':'https://www.hulu.jp/search?q=',
-  'Disney+':'https://www.disneyplus.com/search/',
-  'dTV':'https://video.dmkt-sp.jp/search/?keyword=',
-  'Lemino':'https://lemino.docomo.ne.jp/search?keyword=',
+// 配信サービス設定（アフィリエイトリンク＋アイコン）
+const STREAM_CFG={
+  'Netflix':       {icon:'🎬', url:'https://www.netflix.com/search?q='},
+  'U-NEXT':        {icon:'▶',  url:'https://video.unext.jp/search?query='},
+  'Amazon Prime Video':{icon:'📦', url:'https://www.amazon.co.jp/s?k='},
+  'Hulu':          {icon:'🌐', url:'https://www.hulu.jp/search?q='},
+  'Disney+':       {icon:'✨', url:'https://www.disneyplus.com/search/'},
+  'dTV':           {icon:'📱', url:'https://video.dmkt-sp.jp/search/?keyword='},
+  'Lemino':        {icon:'🎵', url:'https://lemino.docomo.ne.jp/search?keyword='},
+  'WATCHA':        {icon:'🍿', url:'https://watcha.com/search?query='},
+  'Apple TV+':     {icon:'🍎', url:'https://tv.apple.com/search?term='},
 };
+
+// 有効なtypeのホワイトリスト（ドラマ・映画のみ）
+const VALID_TYPES = new Set(['ドラマ','映画']);
 
 const SC={
   '視聴済み':{hex:'#B07870',bg:'#F5EEEC'},
-  '視聴中':{hex:'#C8A09A',bg:'#F7F2F0'},
-  '未視聴':{hex:'#CEB6AF',bg:'#F8F4F2'},
-  '視聴予定':{hex:'#5B9BBF',bg:'#EBF4FA'},  // 水色
-  'リタイア':{hex:'#9A9A9A',bg:'#F2F2F2'},  // グレー
+  '視聴中':  {hex:'#C8A09A',bg:'#F7F2F0'},
+  '未視聴':  {hex:'#CEB6AF',bg:'#F8F4F2'},
+  '視聴予定':{hex:'#5B9BBF',bg:'#EBF4FA'},
+  'リタイア':{hex:'#9A9A9A',bg:'#F2F2F2'},
 };
 
-// ── STATE ──
-let accessToken=null,currentUser=null;
-let authMode='login';
-let userDramas={};  // drama_id → {status,rating,id}
-let detDramaId=null,detRating=0;
-let browseFilter={year:'all',stream:'all',genre:'all'};
+// ═══════════════════════════════════════════════
+//  状態
+// ═══════════════════════════════════════════════
+let accessToken=null, currentUser=null;
+let userDramas={};        // drama_id → {status,rating,id}
+let myDramasCache=[];     // マイリスト用キャッシュ
+let detDramaId=null, detRating=0;
+let browseFilter={type:'all', year:'all', stream:'all'};
 let browseOffset=0;
 const BROWSE_LIMIT=40;
 let myFilter='all';
 let browseDebounce=null;
+let currentPage='top';    // ← アプリ内ページ履歴管理用
 
-// ── UTILS ──
+// ═══════════════════════════════════════════════
+//  ユーティリティ
+// ═══════════════════════════════════════════════
 function hearts(n){return n?'♥'.repeat(n):'';}
-function esc(s){return(s||'').replace(/'/g,"&#39;").replace(/"/g,'&quot;');}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
 async function sbFetch(path,method='GET',body=null,token=null){
   const headers={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+(token||SUPA_KEY)};
   if(method==='POST') headers['Prefer']='return=representation';
@@ -532,31 +521,60 @@ async function sbFetch(path,method='GET',body=null,token=null){
   try{return{ok:r.ok,status:r.status,data:JSON.parse(text)};}
   catch{return{ok:r.ok,status:r.status,data:text};}
 }
-function showSaved(){const el=document.getElementById('saveInd');el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000);}
+
+function showSaved(){
+  const el=document.getElementById('saveInd');
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2000);
+}
+
 function posterEl(path,cls){
-  if(path)return`<img class="${cls}" src="${TMDB_IMG}${path}" alt="" loading="lazy" onerror="this.style.display='none';this.nextSibling.style.display='flex'"><div class="${cls}-ph" style="display:none">🎬</div>`;
+  if(path) return`<img class="${cls}" src="${TMDB_IMG}${path}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="${cls}-ph" style="display:none">🎬</div>`;
   return`<div class="${cls}-ph">🎬</div>`;
 }
 
-// ── AUTH ──
-function switchAuthTab(mode,el){}  // 互換性のため残す
-function doGoogleLogin(){
-  // redirect_toをhttps://.../#appにすることでログイン後のhashを制御
-  const redirectTo=window.location.origin+window.location.pathname;
-  // ログイン前の履歴を全部置き換えてsupabaseのURLが残らないようにする
-  history.replaceState(null,'',window.location.pathname);
-  window.location.href=`${SUPA_URL}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`;
+// ═══════════════════════════════════════════════
+//  出演者名のフォーマット
+//  「ハングル名 (カタカナ名)」形式に統一
+//  - name_original にハングルがあればそちらを優先表示
+//  - name にカタカナがあれば括弧内に追加
+// ═══════════════════════════════════════════════
+function formatCastName(name, nameOriginal){
+  const hasHangul = s => /[\uAC00-\uD7A3]/.test(s||'');
+  const hasKatakana = s => /[\u30A0-\u30FF]/.test(s||'');
+  const hasLatin = s => /[A-Za-z]/.test(s||'');
+
+  const orig = (nameOriginal||'').trim();
+  const disp = (name||'').trim();
+
+  // ハングルが原語名にある → 「ハングル名」をメイン表示
+  if(hasHangul(orig)){
+    // nameにカタカナがあれば「ハングル (カタカナ)」
+    if(hasKatakana(disp)) return `${orig} (${disp})`;
+    return orig;
+  }
+  // ハングルが表示名にある → そのまま
+  if(hasHangul(disp)) return disp;
+  // どちらもラテン文字のみ → 表示名をそのまま
+  return disp || orig;
 }
 
-async function doAuth(){} // 互換性のため残す
-
+// ═══════════════════════════════════════════════
+//  認証
+// ═══════════════════════════════════════════════
+function doGoogleLogin(){
+  const redirectTo = window.location.origin + window.location.pathname;
+  window.location.href = `${SUPA_URL}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`;
+}
 
 async function doLogout(){
   try{ await sbFetch('/auth/v1/logout','POST',null,accessToken); }catch(e){}
-  try{ localStorage.removeItem('kdrama_token');localStorage.removeItem('kdrama_user'); }catch(e){}
-  accessToken=null;currentUser=null;userDramas={};myDramasCache=[];
+  try{ localStorage.removeItem('kdrama_token'); localStorage.removeItem('kdrama_user'); }catch(e){}
+  accessToken=null; currentUser=null; userDramas={}; myDramasCache=[];
   document.getElementById('appWrap').style.display='none';
   document.getElementById('authWrap').style.display='flex';
+  // hashを削除してGoogleページへの戻りを防ぐ
+  history.replaceState(null,'',window.location.pathname);
 }
 
 async function startApp(){
@@ -566,25 +584,653 @@ async function startApp(){
   }catch(e){}
   document.getElementById('authWrap').style.display='none';
   document.getElementById('appWrap').style.display='block';
-  document.getElementById('navEmail').textContent=currentUser.email;
-  // ブラウザの戻るボタン対策：hashを設定
-  if(!window.location.hash) history.pushState(null,'',window.location.pathname+'#app');
+  document.getElementById('navEmail').textContent=currentUser.email||'';
+  // アプリ開始時に履歴を初期化
+  // replaceStateで現在のエントリをapp#topにし、ブラウザ履歴にGoogleのURLが残らないようにする
+  history.replaceState({page:'top'},'',window.location.pathname+'#top');
   await loadUserDramas();
-  showPage('top');
+  await showPage('top');
 }
 
-// 戻るボタン対策
-window.addEventListener('popstate',async function(){
-  if(accessToken)return;
-  const token=localStorage.getItem('kdrama_token');
-  if(token){
-    const r=await sbFetch('/auth/v1/user','GET',null,token);
-    if(r.ok&&r.data?.id){
-      accessToken=token;currentUser=r.data;
-      document.getElementById('authWrap').style.display='none';
-      document.getElementById('appWrap').style.display='block';
-    }
+// ═══════════════════════════════════════════════
+//  戻るボタン対応
+//  ポイント：アプリ内ページ遷移をhistory.pushStateで管理し、
+//  popstateでアプリ内ナビゲーションのみ処理する。
+//  ログイン画面への遷移は絶対に起こさない。
+// ═══════════════════════════════════════════════
+window.addEventListener('popstate', async function(e){
+  // ログイン済みの場合のみ処理
+  if(!accessToken){
+    // 未ログインでpopstateが来た場合は認証画面を表示するだけ
+    document.getElementById('authWrap').style.display='flex';
+    document.getElementById('appWrap').style.display='none';
+    return;
   }
+  // stateにページ情報があればそこへ遷移（履歴を増やさない）
+  const page = e.state?.page || 'top';
+  await showPage(page, null, true); // third arg = fromPopstate
 });
 
+// ═══════════════════════════════════════════════
+//  ページ管理
+// ═══════════════════════════════════════════════
+async function showPage(name, tabEl=null, fromPopstate=false){
+  // すべてのページを非表示
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
 
+  const page = document.getElementById('page-'+name);
+  if(page) page.classList.add('active');
+
+  // navタブのアクティブ化
+  if(tabEl){
+    tabEl.classList.add('active');
+  } else {
+    const tab = document.getElementById('nav-'+name);
+    if(tab) tab.classList.add('active');
+  }
+
+  currentPage = name;
+
+  // popstateでない場合のみhistoryを追加（二重追加防止）
+  if(!fromPopstate){
+    history.pushState({page:name},'',window.location.pathname+'#'+name);
+  }
+
+  // ページ別の初期化処理
+  if(name==='top') await loadTop();
+  else if(name==='browse'){ browseOffset=0; await loadBrowse(); }
+  else if(name==='mylist') renderMyList();
+}
+
+// ═══════════════════════════════════════════════
+//  ユーザードラマ一覧を取得
+// ═══════════════════════════════════════════════
+async function loadUserDramas(){
+  if(!currentUser) return;
+  const r = await sbFetch(`/rest/v1/user_dramas?user_id=eq.${currentUser.id}&select=id,drama_id,status,rating`,
+    'GET',null,accessToken);
+  if(r.ok && Array.isArray(r.data)){
+    userDramas={};
+    myDramasCache=[];
+    r.data.forEach(d=>{
+      userDramas[d.drama_id]={status:d.status,rating:d.rating,id:d.id};
+      myDramasCache.push(d);
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  トップページ
+// ═══════════════════════════════════════════════
+async function loadTop(){
+  const el = document.getElementById('topContent');
+  el.innerHTML='<div class="loading-wrap"><div class="spin"></div><div class="loading-text">読み込み中...</div></div>';
+
+  // ドラマ・映画のみ取得（type=in.(ドラマ,映画)）
+  const [rTotal, rDramas] = await Promise.all([
+    sbFetch('/rest/v1/dramas?select=count&type=in.(ドラマ,映画)'),
+    sbFetch('/rest/v1/dramas?select=id,title,original,type,genre,year,poster,score&type=in.(ドラマ,映画)&order=score.desc.nullslast&limit=20'),
+  ]);
+
+  const total = rTotal.ok ? (rTotal.data[0]?.count||0) : 0;
+  document.getElementById('heroTotal').textContent = total;
+  const watched = Object.values(userDramas).filter(d=>d.status==='視聴済み').length;
+  document.getElementById('heroWatched').textContent = watched;
+
+  if(!rDramas.ok || !rDramas.data.length){
+    el.innerHTML='<div class="no-res">データを読み込めませんでした</div>'; return;
+  }
+
+  // 人気ランキング（上位10）
+  const top10 = rDramas.data.slice(0,10);
+  // 新着（year降順 上位10）
+  const rNew = await sbFetch('/rest/v1/dramas?select=id,title,original,type,year,poster,score&type=in.(ドラマ,映画)&order=year.desc.nullslast,id.desc&limit=10');
+  const newDramas = rNew.ok ? rNew.data : [];
+
+  let html = '';
+
+  // ランキング
+  html += `<div class="section"><div class="section-title">🏆 人気ランキング</div></div>`;
+  html += `<div class="section"><div class="rank-grid">`;
+  top10.forEach((d,i)=>{
+    const ud = userDramas[d.id];
+    const sc = ud?.status ? SC[ud.status] : null;
+    html += `<div class="rank-card" onclick="openDet(${d.id})">
+      ${posterEl(d.poster,'rank-poster')}
+      <div class="rank-badge">${i+1}位</div>
+      ${ud?.status?`<div class="dcard-status" style="background:${sc?.bg};color:${sc?.hex}">${ud.status}</div>`:''}
+      <div class="rank-info">
+        <div class="rank-title">${esc(d.title)}</div>
+        <div class="rank-meta">${d.year||''} · <span class="tag-type">${d.type||''}</span></div>
+        ${d.score?`<div class="rank-score">♥ ${d.score.toFixed(1)}</div>`:''}
+      </div>
+    </div>`;
+  });
+  html += `</div></div>`;
+
+  // 新着
+  if(newDramas.length){
+    html += `<div class="section" style="margin-top:8px"><div class="section-title">🆕 新着作品</div></div>`;
+    html += `<div class="section"><div class="rank-grid">`;
+    newDramas.forEach(d=>{
+      const ud = userDramas[d.id];
+      const sc = ud?.status ? SC[ud.status] : null;
+      html += `<div class="rank-card" onclick="openDet(${d.id})">
+        ${posterEl(d.poster,'rank-poster')}
+        ${ud?.status?`<div class="dcard-status" style="background:${sc?.bg};color:${sc?.hex}">${ud.status}</div>`:''}
+        <div class="rank-info">
+          <div class="rank-title">${esc(d.title)}</div>
+          <div class="rank-meta">${d.year||''} · <span class="tag-type">${d.type||''}</span></div>
+        </div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  html += '<div style="padding-bottom:32px"></div>';
+  el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════
+//  作品一覧ページ
+// ═══════════════════════════════════════════════
+function setBrowseFilter(key, val, el){
+  browseFilter[key] = val;
+  // 同じグループのchipをリセット
+  const attr = key==='type'?'data-type': key==='year'?'data-year':'data-stream';
+  document.querySelectorAll(`[${attr}]`).forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  browseOffset=0;
+  loadBrowse();
+}
+
+function debounceBrowse(){
+  clearTimeout(browseDebounce);
+  browseDebounce = setTimeout(()=>{ browseOffset=0; loadBrowse(); }, 350);
+}
+
+async function loadBrowse(append=false){
+  const grid = document.getElementById('browseGrid');
+  const info = document.getElementById('browseInfo');
+  const more = document.getElementById('browseMore');
+
+  if(!append){
+    grid.innerHTML='<div class="loading-wrap" style="grid-column:1/-1"><div class="spin"></div></div>';
+    more.innerHTML='';
+  }
+
+  const q = document.getElementById('browseSearch')?.value?.trim()||'';
+  const sort = document.getElementById('browseSort')?.value||'popularity';
+
+  // クエリ組み立て
+  let params = `select=id,title,original,type,genre,year,poster,score,station&limit=${BROWSE_LIMIT}&offset=${browseOffset}`;
+
+  // ★修正①：ドラマ・映画のみ（無効なtypeは除外）
+  if(browseFilter.type && browseFilter.type!=='all'){
+    params += `&type=eq.${encodeURIComponent(browseFilter.type)}`;
+  } else {
+    params += `&type=in.(ドラマ,映画)`;
+  }
+
+  // 年度フィルター
+  if(browseFilter.year && browseFilter.year!=='all'){
+    if(browseFilter.year==='pre2020') params += `&year=lt.2020`;
+    else params += `&year=eq.${browseFilter.year}`;
+  }
+
+  // テキスト検索
+  if(q) params += `&or=(title.ilike.*${encodeURIComponent(q)}*,original.ilike.*${encodeURIComponent(q)}*)`;
+
+  // ソート
+  const orderMap={popularity:'score.desc.nullslast',year_desc:'year.desc.nullslast,id.desc',year_asc:'year.asc.nullslast',title:'title.asc'};
+  params += `&order=${orderMap[sort]||'score.desc.nullslast'}`;
+
+  // 配信フィルター（stationカラムにilike検索）
+  if(browseFilter.stream && browseFilter.stream!=='all'){
+    params += `&station=ilike.*${encodeURIComponent(browseFilter.stream)}*`;
+  }
+
+  const r = await sbFetch(`/rest/v1/dramas?${params}`, 'GET', null, accessToken||null);
+
+  if(!r.ok){
+    grid.innerHTML='<div class="no-res">読み込みエラー</div>'; return;
+  }
+
+  const dramas = r.data||[];
+
+  if(!append) grid.innerHTML='';
+
+  if(!dramas.length && !append){
+    grid.innerHTML='<div class="no-res">該当する作品がありません</div>';
+    info.textContent=''; more.innerHTML=''; return;
+  }
+
+  dramas.forEach(d=>{
+    const ud = userDramas[d.id];
+    const sc = ud?.status ? SC[ud.status] : null;
+    const card = document.createElement('div');
+    card.className='dcard';
+    card.onclick=()=>openDet(d.id);
+    card.innerHTML=`
+      ${posterEl(d.poster,'dcard-poster')}
+      ${ud?.status?`<div class="dcard-status" style="background:${sc?.bg};color:${sc?.hex}">${ud.status}</div>`:''}
+      <div class="dcard-body">
+        <div class="dcard-title">${esc(d.title)}</div>
+        <div class="dcard-meta">${d.year||''} · ${d.type||''}</div>
+        ${d.score?`<div class="dcard-score">♥ ${d.score.toFixed(1)}</div>`:''}
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  // もっと見るボタン
+  if(dramas.length===BROWSE_LIMIT){
+    more.innerHTML=`<button class="btn-sm" onclick="browseOffset+=${BROWSE_LIMIT};loadBrowse(true)">もっと見る</button>`;
+  } else {
+    more.innerHTML='';
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  マイリストページ
+// ═══════════════════════════════════════════════
+function setMyFilter(val, el){
+  myFilter=val;
+  document.querySelectorAll('[data-mf]').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderMyList();
+}
+
+async function renderMyList(){
+  const grid = document.getElementById('mylistGrid');
+  const q = document.getElementById('mySearch')?.value?.toLowerCase()||'';
+
+  if(!Object.keys(userDramas).length){
+    grid.innerHTML='<div class="no-res">まだリストに追加した作品がありません</div>';
+    renderKpi([]);
+    return;
+  }
+
+  // drama_idのリストを取得
+  const ids = Object.keys(userDramas).join(',');
+  const r = await sbFetch(`/rest/v1/dramas?id=in.(${ids})&select=id,title,original,type,year,poster,eps,score,station`);
+
+  if(!r.ok || !Array.isArray(r.data)){ grid.innerHTML='<div class="no-res">読み込みエラー</div>'; return; }
+
+  let dramas = r.data.map(d=>({...d, _ud:userDramas[d.id]}));
+
+  // フィルター
+  if(myFilter!=='all') dramas=dramas.filter(d=>d._ud?.status===myFilter);
+  if(q) dramas=dramas.filter(d=>(d.title||'').toLowerCase().includes(q)||(d.original||'').toLowerCase().includes(q));
+
+  renderKpi(r.data);
+
+  if(!dramas.length){ grid.innerHTML='<div class="no-res">該当する作品がありません</div>'; return; }
+
+  grid.innerHTML = dramas.map(d=>{
+    const ud=d._ud;
+    const sc=SC[ud?.status]||{};
+    return `<div class="mcard" onclick="openDet(${d.id})">
+      ${posterEl(d.poster,'mcard-poster')}
+      <div class="mcard-body">
+        <div class="mcard-top">
+          <div class="mcard-title">${esc(d.title)}</div>
+          ${ud?.rating?`<div class="mcard-hearts">${hearts(ud.rating)}</div>`:''}
+        </div>
+        <div class="mcard-orig">${esc(d.original||'')}</div>
+        <div class="mcard-meta">
+          ${d.year?`<span>${d.year}</span>`:''}
+          ${d.type?`<span>${d.type}</span>`:''}
+          ${d.eps?`<span>${d.eps}話</span>`:''}
+        </div>
+        <div class="mcard-acts">
+          ${ud?.status?`<span class="sbadge" style="color:${sc.hex||''};border-color:${sc.hex||''};background:${sc.bg||''}">${ud.status}</span>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderKpi(allDramas){
+  const row = document.getElementById('myKpiRow');
+  const total = Object.keys(userDramas).length;
+  const watched = Object.values(userDramas).filter(d=>d.status==='視聴済み').length;
+  const watching = Object.values(userDramas).filter(d=>d.status==='視聴中').length;
+  const plan = Object.values(userDramas).filter(d=>d.status==='視聴予定').length;
+  document.getElementById('mylistSub').textContent=`${total}件登録中`;
+  row.innerHTML=`
+    <div class="kpi" style="--kc:#B07870"><div class="kpi-n">${total}</div><div class="kpi-l">合計登録</div></div>
+    <div class="kpi" style="--kc:#C8A09A"><div class="kpi-n">${watched}</div><div class="kpi-l">視聴済み</div></div>
+    <div class="kpi" style="--kc:#5B9BBF"><div class="kpi-n">${watching}</div><div class="kpi-l">視聴中</div></div>
+    <div class="kpi" style="--kc:#A0B870"><div class="kpi-n">${plan}</div><div class="kpi-l">視聴予定</div></div>
+  `;
+}
+
+// ═══════════════════════════════════════════════
+//  詳細モーダル
+// ═══════════════════════════════════════════════
+async function openDet(id){
+  detDramaId=id; detRating=0;
+  document.getElementById('detOv').classList.add('open');
+  document.body.style.overflow='hidden';
+
+  // モーダルをリセット
+  document.getElementById('dm-title').textContent='読み込み中...';
+  document.getElementById('dm-orig').textContent='';
+  document.getElementById('dm-tags').innerHTML='';
+  document.getElementById('dm-synopsis').textContent='';
+  document.getElementById('dm-meta').innerHTML='';
+  document.getElementById('dm-cast').innerHTML='';
+  document.getElementById('dm-streams').innerHTML='';
+  document.getElementById('dm-cast-wrap').style.display='none';
+  document.getElementById('dm-stream-wrap').style.display='none';
+  document.getElementById('dm-poster').innerHTML='';
+
+  // ドラマ詳細 + キャストを並列取得
+  const [rDrama, rCast] = await Promise.all([
+    sbFetch(`/rest/v1/dramas?id=eq.${id}&select=*`),
+    sbFetch(`/rest/v1/drama_casts?drama_id=eq.${id}&select=name,name_original,role&limit=20`),
+  ]);
+
+  if(!rDrama.ok || !rDrama.data?.length){ document.getElementById('dm-title').textContent='取得失敗'; return; }
+  const d = rDrama.data[0];
+
+  // ポスター
+  document.getElementById('dm-poster').innerHTML = posterEl(d.poster,'mhd-poster');
+
+  // タイトル
+  document.getElementById('dm-title').textContent = d.title||'';
+  document.getElementById('dm-orig').textContent = d.original||'';
+
+  // タグ
+  const genres = (d.genre||'').split(',').map(g=>g.trim()).filter(Boolean);
+  document.getElementById('dm-tags').innerHTML =
+    `<span class="tag-type">${esc(d.type||'')}</span>` +
+    genres.map(g=>`<button class="tag-genre" onclick="browseByGenre('${esc(g)}')">${esc(g)}</button>`).join('');
+
+  // あらすじ
+  const synWrap = document.getElementById('dm-syn-wrap');
+  const syn = d.synopsis||d.overview||'';
+  synWrap.style.display = syn ? '' : 'none';
+  document.getElementById('dm-synopsis').textContent = syn;
+
+  // メタ情報
+  const metaItems=[
+    ['放送局/製作',d.station||d.company||''],
+    ['放送年',d.year||''],
+    ['話数',d.eps?d.eps+'話':''],
+    ['スコア',d.score?'♥ '+d.score.toFixed(1):''],
+  ].filter(([,v])=>v);
+  document.getElementById('dm-meta').innerHTML = metaItems.map(([l,v])=>
+    `<div class="mmi"><div class="mmi-l">${esc(l)}</div><div class="mmi-v">${esc(v)}</div></div>`
+  ).join('');
+
+  // ★修正②：出演者名をカタカナ/ハングル統一表示
+  const casts = rCast.ok ? (rCast.data||[]) : [];
+  if(casts.length){
+    document.getElementById('dm-cast-wrap').style.display='';
+    document.getElementById('dm-cast').innerHTML = casts.map(c=>{
+      const displayName = formatCastName(c.name, c.name_original);
+      return `<button class="cast-chip" onclick="showActor('${esc(c.name_original||c.name)}')">${esc(displayName)}</button>`;
+    }).join('');
+  }
+
+  // ★修正③：配信サービスリンク（stationカラムから取得）
+  // stationカラムは「Netflix, U-NEXT, tvN」のようなカンマ区切り文字列
+  const stationRaw = d.station||'';
+  const streams = stationRaw.split(',').map(s=>s.trim()).filter(Boolean);
+  renderStreamLinks(streams, d.title||'');
+
+  // ユーザーアクション
+  if(currentUser){
+    document.getElementById('dm-useractions').style.display='';
+    const ud = userDramas[id];
+    document.getElementById('dm-status').value = ud?.status||'';
+    detRating = ud?.rating||0;
+    renderDetRating();
+    document.getElementById('dm-saveBtn').textContent = ud ? '📝 更新する' : '📝 リストに登録する';
+  }
+}
+
+// 配信サービスかどうかの判定（stationに放送局も混在するため）
+// STREAM_CFGのキーと前方一致するものだけリンク表示
+function isStreamingService(name){
+  return Object.keys(STREAM_CFG).some(k=>name.includes(k));
+}
+
+function renderStreamLinks(streams, title){
+  const wrap = document.getElementById('dm-stream-wrap');
+  const cont = document.getElementById('dm-streams');
+
+  if(!streams || !streams.length){ wrap.style.display='none'; return; }
+
+  // stationカラムには配信サービスと放送局が混在するため分類する
+  const streamingServices = [];
+  const broadcasters = [];
+
+  streams.forEach(svc=>{
+    // STREAM_CFGのキーが含まれるものは配信サービス
+    const cfgKey = Object.keys(STREAM_CFG).find(k=>svc.includes(k));
+    if(cfgKey) streamingServices.push({name:svc, cfg:STREAM_CFG[cfgKey]});
+    else broadcasters.push(svc);
+  });
+
+  // 配信サービスが1つもなければセクション非表示
+  if(!streamingServices.length){ wrap.style.display='none'; return; }
+
+  wrap.style.display='';
+  cont.innerHTML = streamingServices.map(({name,cfg})=>{
+    const searchUrl = cfg.url + encodeURIComponent(title);
+    return `<a class="stream-chip" href="${searchUrl}" target="_blank" rel="noopener">
+      <span class="stream-chip-icon">${cfg.icon}</span>${esc(name)}
+    </a>`;
+  }).join('');
+}
+
+function ovClick(e){
+  if(e.target===document.getElementById('detOv')) closeDet();
+}
+
+function closeDet(){
+  document.getElementById('detOv').classList.remove('open');
+  document.body.style.overflow='';
+  detDramaId=null;
+}
+
+function setDetRating(n){
+  detRating=n;
+  renderDetRating();
+}
+
+function renderDetRating(){
+  document.querySelectorAll('#dm-spick span').forEach((s,i)=>{
+    s.classList.toggle('on', i<detRating);
+  });
+}
+
+async function saveUserDrama(){
+  if(!currentUser||!detDramaId) return;
+  const status = document.getElementById('dm-status').value;
+  const btn = document.getElementById('dm-saveBtn');
+  btn.disabled=true; btn.textContent='保存中...';
+
+  const existing = userDramas[detDramaId];
+  let r;
+  if(existing){
+    r = await sbFetch(`/rest/v1/user_dramas?id=eq.${existing.id}`,
+      'PATCH',{status,rating:detRating||null},accessToken);
+  } else {
+    r = await sbFetch('/rest/v1/user_dramas','POST',
+      {user_id:currentUser.id,drama_id:detDramaId,status,rating:detRating||null},accessToken);
+  }
+
+  if(r.ok){
+    await loadUserDramas();
+    showSaved();
+    btn.textContent='📝 更新する';
+    // モーダル外のカードのステータスバッジを更新
+    document.querySelectorAll(`[onclick="openDet(${detDramaId})"]`).forEach(card=>{
+      const badge = card.querySelector('.dcard-status');
+      const ud = userDramas[detDramaId];
+      if(ud?.status){
+        const sc=SC[ud.status]||{};
+        if(badge){ badge.style.background=sc.bg; badge.style.color=sc.hex; badge.textContent=ud.status; }
+        else{
+          const b=document.createElement('div');
+          b.className='dcard-status';
+          b.style.background=sc.bg; b.style.color=sc.hex;
+          b.textContent=ud.status;
+          card.appendChild(b);
+        }
+      }
+    });
+  } else {
+    alert('保存に失敗しました');
+  }
+  btn.disabled=false;
+}
+
+// ═══════════════════════════════════════════════
+//  俳優ページ
+// ═══════════════════════════════════════════════
+async function showActor(name){
+  closeDet();
+  // nav-actorタブを表示・アクティブ
+  const navActor = document.getElementById('nav-actor');
+  navActor.style.display='';
+  navActor.textContent=name;
+  navActor.onclick=()=>showActor(name);
+
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-actor').classList.add('active');
+  navActor.classList.add('active');
+  history.pushState({page:'actor',actor:name},'',window.location.pathname+'#actor');
+
+  const el = document.getElementById('actorContent');
+  el.innerHTML='<div class="loading-wrap"><div class="spin"></div></div>';
+
+  const r = await sbFetch(`/rest/v1/drama_casts?name_original=eq.${encodeURIComponent(name)}&select=drama_id,name,name_original,role`);
+  if(!r.ok || !r.data?.length){
+    el.innerHTML=`<div class="no-res">${esc(name)} の出演作品が見つかりませんでした</div>`; return;
+  }
+
+  const ids = [...new Set(r.data.map(c=>c.drama_id))];
+  const rD = await sbFetch(`/rest/v1/dramas?id=in.(${ids.join(',')})&select=id,title,original,type,year,poster,score`);
+  const dramas = rD.ok ? rD.data : [];
+
+  // 表示名
+  const displayName = formatCastName(r.data[0].name, r.data[0].name_original);
+  const initial = displayName.charAt(0).toUpperCase();
+
+  el.innerHTML=`
+    <button class="bk-btn" onclick="history.back()">← 戻る</button>
+    <div class="actor-hero">
+      <div class="actor-av">${esc(initial)}</div>
+      <div>
+        <div class="actor-name">${esc(displayName)}</div>
+        <div class="actor-sub">${dramas.length}作品に出演</div>
+      </div>
+    </div>
+    <div class="actor-works">
+      ${dramas.map(d=>`
+        <div class="dcard" onclick="openDet(${d.id})" style="cursor:pointer">
+          ${posterEl(d.poster,'dcard-poster')}
+          <div class="dcard-body">
+            <div class="dcard-title">${esc(d.title)}</div>
+            <div class="dcard-meta">${d.year||''} · ${d.type||''}</div>
+            ${d.score?`<div class="dcard-score">♥ ${d.score.toFixed(1)}</div>`:''}
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════
+//  Netflixインポート
+// ═══════════════════════════════════════════════
+async function handleNetflixCSV(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const result = document.getElementById('importResult');
+  result.innerHTML='<div>読み込み中...</div>';
+
+  const text = await file.text();
+  const lines = text.split('\n').filter(l=>l.trim());
+  // ヘッダー行をスキップ
+  const titles = lines.slice(1).map(l=>{
+    const parts = l.split(',');
+    return parts[0]?.replace(/^"|"$/g,'').trim();
+  }).filter(Boolean);
+
+  let ok=0, ng=0;
+  result.innerHTML=`<div>0/${titles.length}件処理中...</div>`;
+
+  for(let i=0;i<titles.length;i++){
+    const t=titles[i];
+    // タイトルでドラマを検索（ドラマ・映画のみ）
+    const r = await sbFetch(`/rest/v1/dramas?title=ilike.*${encodeURIComponent(t)}*&type=in.(ドラマ,映画)&limit=1`);
+    if(r.ok && r.data?.length){
+      const d=r.data[0];
+      const exists=userDramas[d.id];
+      if(!exists){
+        const rs = await sbFetch('/rest/v1/user_dramas','POST',
+          {user_id:currentUser.id,drama_id:d.id,status:'視聴済み'},accessToken);
+        if(rs.ok) ok++;
+        else ng++;
+      } else ok++;
+    } else ng++;
+
+    if((i+1)%10===0 || i===titles.length-1){
+      result.innerHTML=`<div>${i+1}/${titles.length}件処理中...</div>`;
+    }
+  }
+
+  await loadUserDramas();
+  result.innerHTML=`<div class="ok">✓ ${ok}件登録しました</div>${ng?`<div class="ng">✗ ${ng}件マッチしませんでした</div>`:''}`;
+}
+
+// ═══════════════════════════════════════════════
+//  起動処理
+// ═══════════════════════════════════════════════
+(async function init(){
+  // URLのhashやクエリパラメータからSupabaseのセッショントークンを取得
+  const hash = window.location.hash;
+  const params = new URLSearchParams(hash.startsWith('#') ? hash.slice(1) : window.location.search.slice(1));
+  const accessTokenFromUrl = params.get('access_token');
+
+  if(accessTokenFromUrl){
+    // Googleログイン後のリダイレクト
+    accessToken = accessTokenFromUrl;
+    const r = await sbFetch('/auth/v1/user','GET',null,accessToken);
+    if(r.ok && r.data?.id){
+      currentUser = r.data;
+      // URLからトークンを除去してクリーンなURLにする（★戻るボタン修正の核心）
+      history.replaceState(null,'',window.location.pathname);
+      await startApp();
+      return;
+    }
+  }
+
+  // localStorageからセッション復元
+  try{
+    const savedToken = localStorage.getItem('kdrama_token');
+    if(savedToken){
+      const r = await sbFetch('/auth/v1/user','GET',null,savedToken);
+      if(r.ok && r.data?.id){
+        accessToken = savedToken;
+        currentUser = r.data;
+        await startApp();
+        return;
+      } else {
+        localStorage.removeItem('kdrama_token');
+        localStorage.removeItem('kdrama_user');
+      }
+    }
+  }catch(e){}
+
+  // 未ログイン
+  document.getElementById('authWrap').style.display='flex';
+})();
+</script>
+</body>
+</html>

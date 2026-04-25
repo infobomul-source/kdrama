@@ -927,7 +927,7 @@ async function openDet(id){
   // ドラマ詳細 + キャストを並列取得
   const [rDrama, rCast] = await Promise.all([
     sbFetch(`/rest/v1/dramas?id=eq.${id}&select=*`),
-    sbFetch(`/rest/v1/drama_casts?drama_id=eq.${id}&select=name,name_original,role&limit=20`),
+    sbFetch(`/rest/v1/drama_cast?drama_id=eq.${id}&select=name,name_original,role&limit=20`),
   ]);
 
   if(!rDrama.ok || !rDrama.data?.length){ document.getElementById('dm-title').textContent='取得失敗'; return; }
@@ -972,11 +972,10 @@ async function openDet(id){
     }).join('');
   }
 
-  // ★修正③：配信サービスリンク（stationカラムから取得）
-  // stationカラムは「Netflix, U-NEXT, tvN」のようなカンマ区切り文字列
-  const stationRaw = d.station||'';
-  const streams = stationRaw.split(',').map(s=>s.trim()).filter(Boolean);
-  renderStreamLinks(streams, d.title||'');
+  // ★修正③：配信サービスリンク（drama_streamsテーブルから取得）
+  const rStreams = await sbFetch(`/rest/v1/drama_streams?drama_id=eq.${id}&select=service,url`);
+  const streamRows = (rStreams.ok && Array.isArray(rStreams.data)) ? rStreams.data : [];
+  renderStreamLinks(streamRows, d.title||'');
 
   // ユーザーアクション
   if(currentUser){
@@ -995,31 +994,20 @@ function isStreamingService(name){
   return Object.keys(STREAM_CFG).some(k=>name.includes(k));
 }
 
-function renderStreamLinks(streams, title){
+function renderStreamLinks(streamRows, title){
   const wrap = document.getElementById('dm-stream-wrap');
   const cont = document.getElementById('dm-streams');
 
-  if(!streams || !streams.length){ wrap.style.display='none'; return; }
-
-  // stationカラムには配信サービスと放送局が混在するため分類する
-  const streamingServices = [];
-  const broadcasters = [];
-
-  streams.forEach(svc=>{
-    // STREAM_CFGのキーが含まれるものは配信サービス
-    const cfgKey = Object.keys(STREAM_CFG).find(k=>svc.includes(k));
-    if(cfgKey) streamingServices.push({name:svc, cfg:STREAM_CFG[cfgKey]});
-    else broadcasters.push(svc);
-  });
-
-  // 配信サービスが1つもなければセクション非表示
-  if(!streamingServices.length){ wrap.style.display='none'; return; }
+  if(!streamRows || !streamRows.length){ wrap.style.display='none'; return; }
 
   wrap.style.display='';
-  cont.innerHTML = streamingServices.map(({name,cfg})=>{
-    const searchUrl = cfg.url + encodeURIComponent(title);
-    return `<a class="stream-chip" href="${searchUrl}" target="_blank" rel="noopener">
-      <span class="stream-chip-icon">${cfg.icon}</span>${esc(name)}
+  cont.innerHTML = streamRows.map(({service, url})=>{
+    // urlカラムが直リンクならそのまま使用、なければサービス名で検索リンクを生成
+    const cfgKey = Object.keys(STREAM_CFG).find(k=>service.includes(k));
+    const cfg = cfgKey ? STREAM_CFG[cfgKey] : {icon:'▶', url:'https://www.google.com/search?q='};
+    const href = url || (cfg.url + encodeURIComponent(title));
+    return `<a class="stream-chip" href="${esc(href)}" target="_blank" rel="noopener">
+      <span class="stream-chip-icon">${cfg.icon}</span>${esc(service)}で見る
     </a>`;
   }).join('');
 }
@@ -1107,7 +1095,7 @@ async function showActor(name){
   const el = document.getElementById('actorContent');
   el.innerHTML='<div class="loading-wrap"><div class="spin"></div></div>';
 
-  const r = await sbFetch(`/rest/v1/drama_casts?name_original=eq.${encodeURIComponent(name)}&select=drama_id,name,name_original,role`);
+  const r = await sbFetch(`/rest/v1/drama_cast?name_original=eq.${encodeURIComponent(name)}&select=drama_id,name,name_original,role`);
   if(!r.ok || !r.data?.length){
     el.innerHTML=`<div class="no-res">${esc(name)} の出演作品が見つかりませんでした</div>`; return;
   }

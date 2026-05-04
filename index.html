@@ -96,7 +96,7 @@ body{background:var(--bg);color:var(--text);font-family:Meiryo,'メイリオ','M
 .dcard-body{padding:8px 10px;}
 .dcard-title{font-size:0.8rem;font-weight:700;line-height:1.3;margin-bottom:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .dcard-meta{font-size:0.68rem;color:var(--muted);}
-.dcard-status{position:absolute;top:6px;right:6px;border-radius:6px;padding:2px 6px;font-size:0.62rem;font-weight:700;}
+.dcard-status,.rank-status{position:absolute;top:6px;right:6px;border-radius:6px;padding:2px 6px;font-size:0.62rem;font-weight:700;z-index:2;}
 .dcard-score{font-size:0.7rem;color:var(--heart);}
 
 /* ── MYLIST PAGE ── */
@@ -109,18 +109,18 @@ body{background:var(--bg);color:var(--text);font-family:Meiryo,'メイリオ','M
 .kpi-l{font-size:0.68rem;color:var(--muted);margin-top:3px;}
 
 /* マイリストカード（横長） */
-.mylist-grid{display:flex;flex-direction:column;gap:8px;padding:0 16px 24px;}
-.mcard{background:var(--white);border:1px solid var(--border);border-radius:var(--r);display:flex;gap:12px;padding:12px;box-shadow:var(--shadow);cursor:pointer;transition:all .15s;align-items:flex-start;}
-.mcard:hover{background:var(--bg2);}
-.mcard-poster{width:54px;height:80px;object-fit:cover;border-radius:6px;background:var(--bg2);flex-shrink:0;}
-.mcard-poster-ph{width:54px;height:80px;border-radius:6px;background:linear-gradient(135deg,var(--bg2),var(--bg3));display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
-.mcard-body{flex:1;min-width:0;}
-.mcard-top{display:flex;align-items:flex-start;gap:8px;margin-bottom:4px;}
-.mcard-title{font-size:0.9rem;font-weight:700;flex:1;line-height:1.3;}
-.mcard-hearts{color:var(--heart);font-size:0.8rem;flex-shrink:0;}
-.mcard-orig{font-size:0.72rem;color:var(--muted);margin-bottom:5px;}
-.mcard-meta{font-size:0.71rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px;}
-.mcard-acts{display:flex;gap:6px;margin-top:8px;}
+.mylist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;padding:12px 16px 24px;}
+.mcard{background:var(--white);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all .17s;box-shadow:var(--shadow);position:relative;}
+.mcard:hover{transform:translateY(-3px);box-shadow:var(--shadow2);}
+.mcard-poster{width:100%;aspect-ratio:2/3;object-fit:cover;background:var(--bg2);display:block;}
+.mcard-poster-ph{width:100%;aspect-ratio:2/3;background:linear-gradient(135deg,var(--bg2),var(--bg3));display:flex;align-items:center;justify-content:center;font-size:1.8rem;}
+.mcard-body{padding:8px 10px;}
+.mcard-top{display:flex;align-items:flex-start;gap:4px;margin-bottom:2px;}
+.mcard-title{font-size:0.8rem;font-weight:700;flex:1;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.mcard-hearts{color:var(--heart);font-size:0.7rem;flex-shrink:0;}
+.mcard-orig{font-size:0.68rem;color:var(--muted);margin-bottom:3px;}
+.mcard-meta{font-size:0.68rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px;}
+.mcard-acts{margin-top:5px;}
 .sbadge{border:1px solid;border-radius:100px;padding:2px 8px;font-size:0.68rem;font-weight:700;white-space:nowrap;flex-shrink:0;}
 
 /* ── DETAIL MODAL ── */
@@ -317,6 +317,7 @@ body{background:var(--bg);color:var(--text);font-family:Meiryo,'メイリオ','M
       <div class="frow">
         <span class="flbl">年度</span>
         <button class="chip active" data-year="all" onclick="setBrowseFilter('year','all',this)">すべて</button>
+        <button class="chip" data-year="2026" onclick="setBrowseFilter('year','2026',this)">2026</button>
         <button class="chip" data-year="2025" onclick="setBrowseFilter('year','2025',this)">2025</button>
         <button class="chip" data-year="2024" onclick="setBrowseFilter('year','2024',this)">2024</button>
         <button class="chip" data-year="2023" onclick="setBrowseFilter('year','2023',this)">2023</button>
@@ -470,15 +471,19 @@ const TMDB_IMG='https://image.tmdb.org/t/p/w300';
 
 // 配信サービス設定（アフィリエイトリンク＋アイコン）
 const STREAM_CFG={
-  'Netflix':       {icon:'🎬', url:'https://www.netflix.com/search?q='},
-  'U-NEXT':        {icon:'▶',  url:'https://video.unext.jp/search?query='},
-  'Amazon Prime Video':{icon:'📦', url:'https://www.amazon.co.jp/s?k='},
-  'Hulu':          {icon:'🌐', url:'https://www.hulu.jp/search?q='},
-  'Disney+':       {icon:'✨', url:'https://www.disneyplus.com/search/'},
-  'dTV':           {icon:'📱', url:'https://video.dmkt-sp.jp/search/?keyword='},
-  'Lemino':        {icon:'🎵', url:'https://lemino.docomo.ne.jp/search?keyword='},
-  'WATCHA':        {icon:'🍿', url:'https://watcha.com/search?query='},
-  'Apple TV+':     {icon:'🍎', url:'https://tv.apple.com/search?term='},
+  'Netflix':            {icon:'🎬', url:'https://www.netflix.com/search?q='},
+  'U-NEXT':             {icon:'▶',  url:'https://video.unext.jp/search?query='},
+  'Amazon Prime Video': {icon:'📦', url:'https://www.amazon.co.jp/s?k='},
+  'Prime Video':        {icon:'📦', url:'https://www.amazon.co.jp/s?k='},
+  'Hulu':               {icon:'🌐', url:'https://www.hulu.jp/search?q='},
+  'Disney+':            {icon:'✨', url:'https://www.disneyplus.com/search/'},
+  'dTV':                {icon:'📱', url:'https://video.dmkt-sp.jp/search/?keyword='},
+  'Lemino':             {icon:'🎵', url:'https://lemino.docomo.ne.jp/search?keyword='},
+  'WATCHA':             {icon:'🍿', url:'https://watcha.com/search?query='},
+  'Apple TV+':          {icon:'🍎', url:'https://tv.apple.com/search?term='},
+  'TVING':              {icon:'📺', url:'https://www.tving.com/search?keyword='},
+  'wavve':              {icon:'🌊', url:'https://www.wavve.com/search?keyword='},
+  'YouTube':            {icon:'▶️', url:'https://www.youtube.com/results?search_query='},
 };
 
 // 有効なtypeのホワイトリスト（ドラマ・映画のみ）
@@ -699,7 +704,7 @@ async function loadTop(){
     html += `<div class="rank-card" onclick="openDet(${d.id})">
       ${posterEl(d.poster_path,'rank-poster')}
       <div class="rank-badge">${i+1}位</div>
-      ${ud?.status?`<div class="dcard-status" style="background:${sc?.bg};color:${sc?.hex}">${ud.status}</div>`:''}
+      ${ud?.status && sc?`<div class="dcard-status" style="background:${sc.bg};color:${sc.hex}">${ud.status}</div>`:''}
       <div class="rank-info">
         <div class="rank-title">${esc(d.title)}</div>
         <div class="rank-meta">${d.year||''} · <span class="tag-type">${d.type||''}</span></div>
@@ -717,7 +722,7 @@ async function loadTop(){
       const sc = ud?.status ? SC[ud.status] : null;
       html += `<div class="rank-card" onclick="openDet(${d.id})">
         ${posterEl(d.poster_path,'rank-poster')}
-        ${ud?.status?`<div class="dcard-status" style="background:${sc?.bg};color:${sc?.hex}">${ud.status}</div>`:''}
+        ${ud?.status && sc?`<div class="dcard-status" style="background:${sc.bg};color:${sc.hex}">${ud.status}</div>`:''}
         <div class="rank-info">
           <div class="rank-title">${esc(d.title)}</div>
           <div class="rank-meta">${d.year||''} · <span class="tag-type">${d.type||''}</span></div>
@@ -811,9 +816,10 @@ async function loadBrowse(append=false){
     const card = document.createElement('div');
     card.className='dcard';
     card.onclick=()=>openDet(d.id);
+    const udBadge = ud?.status && SC[ud.status] ? `<div class="dcard-status" style="position:absolute;top:6px;right:6px;border-radius:6px;padding:2px 6px;font-size:0.62rem;font-weight:700;background:${SC[ud.status].bg};color:${SC[ud.status].hex}">${ud.status}</div>` : '';
     card.innerHTML=`
       ${posterEl(d.poster_path,'dcard-poster')}
-      ${ud?.status?`<div class="dcard-status" style="background:${sc?.bg};color:${sc?.hex}">${ud.status}</div>`:''}
+      ${udBadge}
       <div class="dcard-body">
         <div class="dcard-title">${esc(d.title)}</div>
         <div class="dcard-meta">${d.year||''} · ${d.type||''}</div>
@@ -868,21 +874,19 @@ async function renderMyList(){
   grid.innerHTML = dramas.map(d=>{
     const ud=d._ud;
     const sc=SC[ud?.status]||{};
+    const badge = ud?.status ? `<div class="dcard-status" style="position:absolute;top:6px;right:6px;border-radius:6px;padding:2px 6px;font-size:0.62rem;font-weight:700;background:${sc.bg||''};color:${sc.hex||''}">${ud.status}</div>` : '';
+    const heartStr = ud?.rating ? `<div class="mcard-hearts">${hearts(ud.rating)}</div>` : '';
     return `<div class="mcard" onclick="openDet(${d.id})">
       ${posterEl(d.poster_path,'mcard-poster')}
+      ${badge}
       <div class="mcard-body">
         <div class="mcard-top">
           <div class="mcard-title">${esc(d.title)}</div>
-          ${ud?.rating?`<div class="mcard-hearts">${hearts(ud.rating)}</div>`:''}
+          ${heartStr}
         </div>
-        <div class="mcard-orig">${esc(d.original||'')}</div>
         <div class="mcard-meta">
           ${d.year?`<span>${d.year}</span>`:''}
-          ${d.type?`<span>${d.type}</span>`:''}
           ${d.eps?`<span>${d.eps}話</span>`:''}
-        </div>
-        <div class="mcard-acts">
-          ${ud?.status?`<span class="sbadge" style="color:${sc.hex||''};border-color:${sc.hex||''};background:${sc.bg||''}">${ud.status}</span>`:''}
         </div>
       </div>
     </div>`;
@@ -980,9 +984,16 @@ async function openDet(id){
   let streamRows = (rStreams.ok && Array.isArray(rStreams.data) && rStreams.data.length) ? rStreams.data : [];
   if(!streamRows.length && d.station){
     // stationカラムから配信サービスを抽出（放送局は除外）
-    const stationList = d.station.split(',').map(s=>s.trim()).filter(Boolean);
+    const stationList = (d.station||'').split(',').map(s=>s.trim()).filter(Boolean);
     streamRows = stationList
-      .filter(s => Object.keys(STREAM_CFG).some(k => s.includes(k)))
+      .filter(s => {
+        const sl = s.toLowerCase();
+        return sl.includes('netflix') || sl.includes('u-next') || sl.includes('unext') ||
+               sl.includes('amazon') || sl.includes('prime') || sl.includes('hulu') ||
+               sl.includes('disney') || sl.includes('dtv') || sl.includes('lemino') ||
+               sl.includes('watcha') || sl.includes('apple') || sl.includes('tving') ||
+               sl.includes('wavve') || sl.includes('seezn') || sl.includes('youtube');
+      })
       .map(s => ({service: s, url: null}));
   }
   renderStreamLinks(streamRows, d.title||'');
@@ -1013,7 +1024,7 @@ function renderStreamLinks(streamRows, title){
   wrap.style.display='';
   cont.innerHTML = streamRows.map(({service, url})=>{
     // urlカラムが直リンクならそのまま使用、なければサービス名で検索リンクを生成
-    const cfgKey = Object.keys(STREAM_CFG).find(k=>service.includes(k));
+    const sl = (service||'').toLowerCase(); const cfgKey = Object.keys(STREAM_CFG).find(k=>sl.includes(k.toLowerCase()));
     const cfg = cfgKey ? STREAM_CFG[cfgKey] : {icon:'▶', url:'https://www.google.com/search?q='};
     const href = url || (cfg.url + encodeURIComponent(title));
     return `<a class="stream-chip" href="${esc(href)}" target="_blank" rel="noopener">

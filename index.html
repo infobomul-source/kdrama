@@ -547,20 +547,23 @@ function posterEl(path,cls){
 function formatCastName(name, nameOriginal){
   const hasHangul = s => /[\uAC00-\uD7A3]/.test(s||'');
   const hasKatakana = s => /[\u30A0-\u30FF]/.test(s||'');
-  const hasLatin = s => /[A-Za-z]/.test(s||'');
 
   const orig = (nameOriginal||'').trim();
   const disp = (name||'').trim();
 
-  // ハングルが原語名にある → 「ハングル名」をメイン表示
+  // パターン1: name_originalにハングル → ハングルをメイン
   if(hasHangul(orig)){
-    // nameにカタカナがあれば「ハングル (カタカナ)」
-    if(hasKatakana(disp)) return `${orig} (${disp})`;
+    if(hasKatakana(disp)) return `${orig} (${disp})`; // ハングル (カタカナ)
+    if(!hasHangul(disp) && disp) return orig; // origのみ
     return orig;
   }
-  // ハングルが表示名にある → そのまま
+  // パターン2: nameにカタカナ、name_originalにハングル（逆パターン）
+  if(hasKatakana(disp) && hasHangul(orig)) return `${orig} (${disp})`;
+  // パターン3: nameにカタカナのみ → nameがメイン（カタカナ表記を優先）
+  if(hasKatakana(disp)) return disp;
+  // パターン4: nameにハングル → そのまま
   if(hasHangul(disp)) return disp;
-  // どちらもラテン文字のみ → 表示名をそのまま
+  // パターン5: どちらもラテン文字 → nameをそのまま
   return disp || orig;
 }
 
@@ -784,7 +787,12 @@ async function loadBrowse(append=false){
   }
 
   // テキスト検索
-  if(q) params += `&or=(title.ilike.*${encodeURIComponent(q)}*,original.ilike.*${encodeURIComponent(q)}*)`;
+  if(q){
+    // 出演者名でも検索できるようにdrama_castとjoinしたサブクエリを使用
+    // シンプルにtitleとoriginalの両方を検索
+    const qe = encodeURIComponent(q);
+    params += `&or=(title.ilike.*${qe}*,original.ilike.*${qe}*)`;
+  }
 
   // ソート
   const orderMap={popularity:'year.desc.nullslast,id.desc',year_desc:'year.desc.nullslast,id.desc',year_asc:'year.asc.nullslast',title:'title.asc'};
@@ -953,9 +961,9 @@ async function openDet(id){
 
   // あらすじ
   const synWrap = document.getElementById('dm-syn-wrap');
-  const syn = d.synopsis||d.overview||'';
-  synWrap.style.display = syn ? '' : 'none';
-  document.getElementById('dm-synopsis').textContent = syn;
+  const syn = (d.synopsis||d.overview||'').trim();
+  synWrap.style.display = '';
+  document.getElementById('dm-synopsis').textContent = syn || '（あらすじ情報なし）';
 
   // メタ情報
   const metaItems=[

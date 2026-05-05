@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>韓ドラ TMDB取得ツール v3</title>
+<style>
+body{font-family:Meiryo,'メイリオ',sans-serif;background:#FAF5F3;color:#3A2825;padding:30px;max-width:800px;margin:0 auto;}
+h1{color:#B07870;font-size:1.3rem;margin-bottom:4px;}
+.sub{color:#A88480;font-size:0.82rem;margin-bottom:20px;}
+.card{background:white;border:1px solid #E0CBC5;border-radius:12px;padding:20px;margin-bottom:14px;box-shadow:0 1px 4px rgba(58,40,37,0.06);}
+.card h2{font-size:0.85rem;color:#6E4A44;margin-bottom:12px;font-weight:700;}
+.btn{background:#B07870;color:white;border:none;border-radius:8px;padding:10px 22px;font-family:inherit;font-size:0.85rem;font-weight:700;cursor:pointer;transition:background .13s;margin-right:8px;margin-bottom:6px;}
+.btn:hover{background:#9A6860;}
+.btn:disabled{opacity:.5;cursor:wait;}
+.btn-stop{background:#c06060;color:white;border:none;border-radius:8px;padding:10px 16px;font-family:inherit;font-size:0.82rem;cursor:pointer;display:none;}
+.progress{background:#F2E9E7;border-radius:100px;height:12px;margin:10px 0;overflow:hidden;}
+.progress-bar{height:100%;background:linear-gradient(90deg,#C8A09A,#B07870);border-radius:100px;transition:width .4s;width:0%;}
+.log{background:#F8F4F2;border:1px solid #E0CBC5;border-radius:8px;padding:12px;height:220px;overflow-y:auto;font-size:0.73rem;line-height:1.9;font-family:monospace;}
+.log .ok{color:#5A7A50;}.log .ng{color:#B06060;}.log .info{color:#A88480;}
+.stat{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0;}
+.stat-item{text-align:center;background:#FAF5F3;border-radius:8px;padding:10px 6px;}
+.stat-n{font-size:1.3rem;font-weight:900;color:#B07870;line-height:1;}
+.stat-l{font-size:0.65rem;color:#A88480;margin-top:4px;}
+.phase{font-size:0.8rem;color:#B07870;font-weight:700;margin:8px 0 4px;}
+.current{font-size:0.73rem;color:#A88480;min-height:18px;margin-top:4px;}
+.tag{display:inline-block;background:#EAD9D5;border-radius:100px;padding:2px 8px;font-size:0.7rem;color:#6E4A44;margin:2px;}
+.fn-url{font-size:0.74rem;color:#A88480;background:#FAF5F3;border:1px solid #E0CBC5;border-radius:6px;padding:6px 10px;margin-bottom:10px;word-break:break-all;}
+</style>
+</head>
+<body>
+<h1>🎬 韓ドラ TMDB取得ツール v3</h1>
+<p class="sub">Supabase Edge Function経由でTMDBからデータを取得します（ブラウザのみ・ターミナル不要）</p>
+
+<div class="card">
+  <h2>① 実行モードを選択</h2>
+  <div style="font-size:0.74rem;color:#A88480;margin-bottom:12px;">
+    除外ジャンル：<span class="tag">Reality</span><span class="tag">Talk</span><span class="tag">アニメーション</span><span class="tag">Kids</span><span class="tag">ドキュメンタリー</span><span class="tag">News</span><span class="tag">Soap</span>
+  </div>
+  <button class="btn" onclick="startFetch('2026')">🆕 2026年の新作を追加</button>
+  <button class="btn" onclick="startFetch('2010-2019')">📚 2010〜2019年を追加</button>
+  <button class="btn" onclick="startFix()">🔧 あらすじ・キャストを補完</button>
+  <button class="btn-stop" id="stopBtn" onclick="stop()">⏹ 停止</button>
+</div>
+
+<div class="card">
+  <h2>② 進捗</h2>
+  <div class="stat">
+    <div class="stat-item"><div class="stat-n" id="statPages">-</div><div class="stat-l">総ページ</div></div>
+    <div class="stat-item"><div class="stat-n" id="statAdded">0</div><div class="stat-l">追加</div></div>
+    <div class="stat-item"><div class="stat-n" id="statSkip">0</div><div class="stat-l">スキップ</div></div>
+    <div class="stat-item"><div class="stat-n" id="statExclude">0</div><div class="stat-l">ジャンル除外</div></div>
+  </div>
+  <div class="progress"><div class="progress-bar" id="progBar"></div></div>
+  <div class="phase" id="phaseLabel">待機中</div>
+  <div class="current" id="currentTitle"></div>
+</div>
+
+<div class="card">
+  <h2>③ ログ</h2>
+  <div class="log" id="log"></div>
+</div>
+
+<script>
+const FN_URL = 'https://rojmsnblqtntaxcaxqgl.supabase.co/functions/v1/tmdb-fetch';
+
+
+let running = false;
+let cntAdded = 0, cntSkip = 0, cntExclude = 0, totalPages = 0, currentPage = 0;
+
+function log(msg, cls='info') {
+  const el = document.getElementById('log');
+  const d = document.createElement('div');
+  d.className = cls;
+  d.textContent = msg;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+}
+function setPhase(msg) { document.getElementById('phaseLabel').textContent = msg; }
+function setCurrent(msg) { document.getElementById('currentTitle').textContent = msg; }
+function updateStats() {
+  document.getElementById('statAdded').textContent = cntAdded;
+  document.getElementById('statSkip').textContent = cntSkip;
+  document.getElementById('statExclude').textContent = cntExclude;
+  if (totalPages > 0) {
+    document.getElementById('progBar').style.width = Math.min(100, currentPage / totalPages * 100) + '%';
+  }
+}
+
+async function callFn(body) {
+  try {
+    const r = await fetch(FN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) {
+      const text = await r.text();
+      throw new Error(`HTTP ${r.status}: ${text.slice(0, 100)}`);
+    }
+    return await r.json();
+  } catch(e) {
+    if (e.name === 'TypeError' && e.message.includes('fetch')) {
+      throw new Error('接続失敗。SupabaseプロジェクトがPausedになっていないか確認してください');
+    }
+    throw e;
+  }
+}
+
+function setButtons(busy) {
+  document.querySelectorAll('.btn').forEach(b => b.disabled = busy);
+  document.getElementById('stopBtn').style.display = busy ? 'inline' : 'none';
+}
+
+function stop() {
+  running = false;
+  setPhase('停止しました');
+  log('手動停止', 'ng');
+}
+
+async function startFetch(mode) {
+  running = true;
+  cntAdded = 0; cntSkip = 0; cntExclude = 0; totalPages = 0; currentPage = 0;
+  document.getElementById('log').innerHTML = '';
+  updateStats();
+  setButtons(true);
+
+  const periods = mode === '2026'
+    ? [{ start: '2026-01-01', end: '2026-12-31', label: '2026年' }]
+    : [
+        { start: '2010-01-01', end: '2010-12-31', label: '2010年' },
+        { start: '2011-01-01', end: '2011-12-31', label: '2011年' },
+        { start: '2012-01-01', end: '2012-12-31', label: '2012年' },
+        { start: '2013-01-01', end: '2013-12-31', label: '2013年' },
+        { start: '2014-01-01', end: '2014-12-31', label: '2014年' },
+        { start: '2015-01-01', end: '2015-12-31', label: '2015年' },
+        { start: '2016-01-01', end: '2016-12-31', label: '2016年' },
+        { start: '2017-01-01', end: '2017-12-31', label: '2017年' },
+        { start: '2018-01-01', end: '2018-12-31', label: '2018年' },
+        { start: '2019-01-01', end: '2019-12-31', label: '2019年' },
+      ];
+
+  for (const period of periods) {
+    if (!running) break;
+    setPhase(`${period.label}を取得中...`);
+    log(`── ${period.label} 開始 ──`, 'info');
+
+    // 1ページ目で総ページ数を取得
+    let maxPages = 1;
+    for (let page = 1; page <= maxPages; page++) {
+      if (!running) break;
+      setCurrent(`${period.label} ${page}ページ目を処理中...`);
+
+      try {
+        const res = await callFn({ mode: 'fetch_page', startDate: period.start, endDate: period.end, page });
+        if (!res.ok) { log(`エラー: ${res.error}`, 'ng'); break; }
+
+        if (page === 1) {
+          maxPages = Math.min(res.totalPages, 500);
+          totalPages += maxPages;
+          document.getElementById('statPages').textContent = totalPages;
+          log(`対象: 約${res.totalResults}件 / ${maxPages}ページ`, 'ok');
+        }
+
+        cntAdded += res.added;
+        cntSkip += res.skipped;
+        cntExclude += res.excluded;
+        currentPage++;
+        updateStats();
+
+        if (res.titles?.length) {
+          log(`✓ p${page}/${maxPages}  +${res.added}件追加: ${res.titles.slice(0,3).join(', ')}${res.titles.length>3?'...':''}`, 'ok');
+        } else {
+          log(`✓ p${page}/${maxPages}  追加:${res.added} スキップ:${res.skipped} 除外:${res.excluded}`, 'ok');
+        }
+      } catch(e) {
+        log(`p${page} エラー: ${e.message}`, 'ng');
+      }
+
+      // Edge Functionのタイムアウト対策で少し待つ
+      await new Promise(r => setTimeout(r, 500));
+    }
+  }
+
+  if (running) {
+    setPhase('✅ 完了！');
+    document.getElementById('progBar').style.width = '100%';
+    log(`\n✅ 完了！ 追加:${cntAdded} スキップ:${cntSkip} ジャンル除外:${cntExclude}`, 'ok');
+  }
+  running = false;
+  setButtons(false);
+  setCurrent('');
+}
+
+async function startFix() {
+  running = true;
+  cntAdded = 0; cntSkip = 0; cntExclude = 0;
+  document.getElementById('log').innerHTML = '';
+  updateStats();
+  setButtons(true);
+  setPhase('あらすじ・キャストを補完中...');
+  log('補完処理を開始します', 'info');
+
+  let offset = 0;
+  let batch = 0;
+  while (running) {
+    try {
+      const res = await callFn({ mode: 'fix_batch', offset });
+      if (!res.ok) { log(`エラー: ${res.error}`, 'ng'); break; }
+
+      cntAdded += res.processed;
+      batch++;
+      updateStats();
+      log(`バッチ ${batch}: ${res.processed}件補完`, 'ok');
+      setCurrent(`補完済み: ${cntAdded}件`);
+
+      if (!res.hasMore) break;
+      offset += 10;
+      await new Promise(r => setTimeout(r, 300));
+    } catch(e) {
+      log(`エラー: ${e.message}`, 'ng');
+      break;
+    }
+  }
+
+  if (running) {
+    setPhase('✅ 補完完了！');
+    log(`\n✅ 補完完了！ ${cntAdded}件処理`, 'ok');
+    document.getElementById('progBar').style.width = '100%';
+  }
+  running = false;
+  setButtons(false);
+  setCurrent('');
+}
+</script>
+</body>
+</html>

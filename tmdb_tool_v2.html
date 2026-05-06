@@ -39,6 +39,7 @@ h1{color:#B07870;font-size:1.3rem;margin-bottom:4px;}
   <button class="btn" onclick="startFetch('2026')">🆕 2026年の新作を追加</button>
   <button class="btn" onclick="startFetch('2010-2019')">📚 2010〜2019年を追加</button>
   <button class="btn" onclick="startFix()">🔧 あらすじ・キャストを補完</button>
+  <button class="btn" onclick="startStreams()" style="background:#7090B0">📡 配信情報を取得（JP）</button>
   <button class="btn-stop" id="stopBtn" onclick="stop()">⏹ 停止</button>
 </div>
 
@@ -115,6 +116,53 @@ function stop() {
   running = false;
   setPhase('停止しました');
   log('手動停止', 'ng');
+}
+
+async function startStreams() {
+  running = true;
+  cntAdded = 0; cntSkip = 0; cntExclude = 0; totalPages = 0; currentPage = 0;
+  document.getElementById('log').innerHTML = '';
+  updateStats();
+  setButtons(true);
+  setPhase('日本向け配信情報を取得中...');
+  log('配信情報取得を開始します（全5700件以上あるので時間がかかります）', 'info');
+
+  let offset = 0;
+  let batch = 0;
+
+  while (running) {
+    try {
+      const res = await callFn({ mode: 'fetch_streams_batch', offset });
+      if (!res.ok) { log(`エラー: ${res.error}`, 'ng'); break; }
+
+      if (res.processed === 0 && !res.hasMore) {
+        log('✅ 全件の配信情報取得完了！', 'ok'); break;
+      }
+
+      cntAdded += res.processed;
+      batch++;
+      currentPage = batch;
+      updateStats();
+      log(`バッチ ${batch}: ${res.processed}件処理`, 'ok');
+      setCurrent(`処理済み: ${cntAdded}件`);
+
+      if (!res.hasMore) { log('✅ 完了！', 'ok'); break; }
+      offset = res.nextOffset || (offset + 20);
+      await new Promise(r => setTimeout(r, 400));
+    } catch(e) {
+      log(`エラー: ${e.message} → 3秒後に再試行`, 'ng');
+      await new Promise(r => setTimeout(r, 3000));
+    }
+  }
+
+  if (running) {
+    setPhase('✅ 配信情報取得完了！');
+    log(`合計 ${cntAdded}件を処理しました`, 'ok');
+    document.getElementById('progBar').style.width = '100%';
+  }
+  running = false;
+  setButtons(false);
+  setCurrent('');
 }
 
 async function startFetch(mode) {

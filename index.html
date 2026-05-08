@@ -484,6 +484,9 @@ const STREAM_CFG={
   'TVING':              {icon:'📺', url:'https://www.tving.com/search?keyword='},
   'wavve':              {icon:'🌊', url:'https://www.wavve.com/search?keyword='},
   'YouTube':            {icon:'▶️', url:'https://www.youtube.com/results?search_query='},
+  'Viki':               {icon:'🌏', url:'https://www.viki.com/search?q='},
+  'Viu':                {icon:'📺', url:'https://www.viu.com/search?keyword='},
+  'Kocowa':             {icon:'🇰🇷', url:'https://www.kocowa.com/search?query='},
 };
 
 // 有効なtypeのホワイトリスト（ドラマ・映画のみ）
@@ -939,7 +942,7 @@ async function openDet(id){
   // ドラマ詳細 + キャストを並列取得
   const tk = accessToken || SUPA_KEY;
   const [rDrama, rCast] = await Promise.all([
-    sbFetch(`/rest/v1/dramas?id=eq.${id}&select=*`, 'GET', null, tk),
+    sbFetch(`/rest/v1/dramas?id=eq.${id}&select=*,streams`, 'GET', null, tk),
     sbFetch(`/rest/v1/drama_cast?drama_id=eq.${id}&select=name,name_original,role&order=id.asc&limit=20`, 'GET', null, tk),
   ]);
 
@@ -987,22 +990,22 @@ async function openDet(id){
   }
 
   // ★修正③：配信サービスリンク
-  // drama_streamsテーブルを優先し、空ならstationカラムにフォールバック
-  const rStreams = await sbFetch(`/rest/v1/drama_streams?drama_id=eq.${id}&select=service,url`, 'GET', null, tk);
-  let streamRows = (rStreams.ok && Array.isArray(rStreams.data) && rStreams.data.length) ? rStreams.data : [];
-  if(!streamRows.length && d.station){
-    // stationカラムから配信サービスを抽出（放送局は除外）
-    const stationList = (d.station||'').split(',').map(s=>s.trim()).filter(Boolean);
+  // streamsカラム（JP向け配信情報の配列）を優先、なければstationからフォールバック
+  let streamRows = [];
+  if(d.streams && Array.isArray(d.streams) && d.streams.length){
+    streamRows = d.streams.map((s) => ({service: s, url: null}));
+  } else if(d.station){
+    const stationList = (d.station||'').split(',').map((s)=>s.trim()).filter(Boolean);
     streamRows = stationList
-      .filter(s => {
+      .filter((s) => {
         const sl = s.toLowerCase();
         return sl.includes('netflix') || sl.includes('u-next') || sl.includes('unext') ||
                sl.includes('amazon') || sl.includes('prime') || sl.includes('hulu') ||
                sl.includes('disney') || sl.includes('dtv') || sl.includes('lemino') ||
                sl.includes('watcha') || sl.includes('apple') || sl.includes('tving') ||
-               sl.includes('wavve') || sl.includes('seezn') || sl.includes('youtube');
+               sl.includes('wavve') || sl.includes('viki') || sl.includes('viu') || sl.includes('youtube');
       })
-      .map(s => ({service: s, url: null}));
+      .map((s) => ({service: s, url: null}));
   }
   renderStreamLinks(streamRows, d.title||'');
 
@@ -1032,8 +1035,9 @@ function renderStreamLinks(streamRows, title){
   wrap.style.display='';
   cont.innerHTML = streamRows.map(({service, url})=>{
     // urlカラムが直リンクならそのまま使用、なければサービス名で検索リンクを生成
-    const sl = (service||'').toLowerCase(); const cfgKey = Object.keys(STREAM_CFG).find(k=>sl.includes(k.toLowerCase()));
-    const cfg = cfgKey ? STREAM_CFG[cfgKey] : {icon:'▶', url:'https://www.google.com/search?q='};
+    const sl2 = (service||'').toLowerCase();
+    const cfgKey = Object.keys(STREAM_CFG).find(k => sl2.includes(k.toLowerCase()));
+    const cfg = cfgKey ? STREAM_CFG[cfgKey] : {icon:'▶', url:'https://www.google.com/search?q='+encodeURIComponent(service)+' '};
     const href = url || (cfg.url + encodeURIComponent(title));
     return `<a class="stream-chip" href="${esc(href)}" target="_blank" rel="noopener">
       <span class="stream-chip-icon">${cfg.icon}</span>${esc(service)}で見る

@@ -40,6 +40,8 @@ h1{color:#B07870;font-size:1.3rem;margin-bottom:4px;}
   <button class="btn" onclick="startFetch('2010-2019')">📚 2010〜2019年を追加</button>
   <button class="btn" onclick="startFix()">🔧 あらすじ・キャストを補完</button>
   <button class="btn" onclick="startStreams()" style="background:#7090B0">📡 配信情報を取得（JP）</button>
+  <button class="btn" onclick="startFixTitles()" style="background:#806090">🔤 日本語タイトルを英語で補完</button>
+  <button class="btn" onclick="startFixCastNames()" style="background:#508070">👤 出演者名を英語で補完</button>
   <button class="btn-stop" id="stopBtn" onclick="stop()">⏹ 停止</button>
 </div>
 
@@ -278,6 +280,58 @@ async function startFix() {
   running = false;
   setButtons(false);
   setCurrent('');
+}
+
+async function startFixTitles() {
+  running = true;
+  cntAdded = 0; totalPages = 0; currentPage = 0;
+  document.getElementById('log').innerHTML = '';
+  updateStats();
+  setButtons(true);
+  setPhase('日本語タイトルがない作品を英語で補完中...');
+  log('ハングルのみのタイトルを英語に変換します（3700件以上あります）', 'info');
+  let offset = 0; let batch = 0;
+  while (running) {
+    try {
+      const res = await callFn({ mode: 'fix_titles_batch', offset });
+      if (!res.ok) { log(`エラー: ${res.error}`, 'ng'); break; }
+      cntAdded += res.processed; batch++; currentPage = batch;
+      updateStats();
+      if (res.processed > 0) log(`バッチ ${batch}: ${res.processed}件変換`, 'ok');
+      setCurrent(`処理済み: ${cntAdded}件変換`);
+      if (!res.hasMore) { log('✅ タイトル補完完了！', 'ok'); break; }
+      offset = res.nextOffset || (offset + 20);
+      await new Promise(r => setTimeout(r, 400));
+    } catch(e) { log(`エラー: ${e.message}`, 'ng'); await new Promise(r => setTimeout(r, 3000)); }
+  }
+  if (running) { setPhase('✅ タイトル補完完了！'); document.getElementById('progBar').style.width = '100%'; log(`合計 ${cntAdded}件を英語タイトルに変換`, 'ok'); }
+  running = false; setButtons(false); setCurrent('');
+}
+
+async function startFixCastNames() {
+  running = true;
+  cntAdded = 0; totalPages = 0; currentPage = 0;
+  document.getElementById('log').innerHTML = '';
+  updateStats();
+  setButtons(true);
+  setPhase('出演者名を英語で補完中...');
+  log('ハングルのみの出演者名を英語名に変換します', 'info');
+  let offset = 0; let batch = 0;
+  while (running) {
+    try {
+      const res = await callFn({ mode: 'fix_cast_names_batch', offset });
+      if (!res.ok) { log(`エラー: ${res.error}`, 'ng'); break; }
+      cntAdded += res.processed; batch++; currentPage = batch;
+      updateStats();
+      if (res.processed > 0) log(`バッチ ${batch}: ${res.processed}件変換`, 'ok');
+      setCurrent(`処理済み: ${cntAdded}件変換`);
+      if (!res.hasMore) { log('✅ 出演者名補完完了！', 'ok'); break; }
+      offset = res.nextOffset || (offset + 10);
+      await new Promise(r => setTimeout(r, 400));
+    } catch(e) { log(`エラー: ${e.message}`, 'ng'); await new Promise(r => setTimeout(r, 3000)); }
+  }
+  if (running) { setPhase('✅ 出演者名補完完了！'); document.getElementById('progBar').style.width = '100%'; log(`合計 ${cntAdded}件を英語名に変換`, 'ok'); }
+  running = false; setButtons(false); setCurrent('');
 }
 </script>
 </body>
